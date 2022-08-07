@@ -1,0 +1,66 @@
+run:
+  deadline: 5m
+
+linters:
+  disable-all: true
+
+  enable:
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exportloopref
+    - forbidigo
+    - goconst
+    - gocritic
+    - godot
+    - godox
+    - goerr113
+    - gofmt
+    - goheader
+    - goimports
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - lll
+    - makezero
+    - misspell
+    - nilerr
+    - noctx
+    - nolintlint
+    - predeclared
+    - promlinter
+    - revive
+    - staticcheck
+    # - structcheck # Disabled for lack of generics support
+    - tagliatelle
+    - testpackage
+    - thelper
+    - tparallel
+    # - typecheck # Fails with C imports
+    - unconvert
+    - unused
+    - varcheck
+    # - wastedassign # Disabled for lack of generics support
+    - whitespace
+
+issues:
+  exclude-use-default: false # disable filtering of defaults for better zero-issue policy
+  exclude:
+    # There is a lot of pointer-mangling happening here, so disable this govet warning
+    - possible misuse of unsafe.Pointer
+  max-per-linter: 0 # disable limit; report all issues of a linter
+  max-same-issues: 0 # disable limit; report all issues of the same issue
+
+linters-settings:
+  lll:
+    line-length: 160
