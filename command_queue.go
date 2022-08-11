@@ -24,6 +24,8 @@ func (cq CommandQueue) String() string {
 const (
 	// QueuePropertiesProperty is a bitfield.
 	//
+	// Use WithQueuePropertyFlags() for convenience.
+	//
 	// Property value type: CommandQueuePropertiesFlags
 	QueuePropertiesProperty uint64 = C.CL_QUEUE_PROPERTIES
 	// QueueSizeProperty specifies the size of the device queue in bytes.
@@ -34,6 +36,8 @@ const (
 	//
 	// If QueueSizeProperty is not specified, the device queue is created with DeviceQueueOnDevicePreferredSizeInfo as
 	// the size of the queue.
+	//
+	// Use WithQueueSize() for convenience.
 	//
 	// Property value type: Uint
 	// Since: 2.0
