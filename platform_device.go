@@ -958,7 +958,7 @@ func DeviceInfoString(id DeviceID, paramName DeviceInfoName) (string, error) {
 // as seen by device.
 //
 // The resolution of the device timer may be queried via DeviceInfo() and the flag DeviceProfilingTimerResolution.
-// The resolution of the host timer may be queried via PlatformInfo() and the flag PlatformHostTimerResolution.
+// The resolution of the host timer may be queried via PlatformInfo() and the flag PlatformHostTimerResolutionInfo.
 //
 // Since: 2.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetDeviceAndHostTimer.html
