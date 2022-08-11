@@ -180,12 +180,12 @@ type ContextInfoName C.cl_context_info
 const (
 	// ContextReferenceCount returns the context reference count.
 	//
+	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
+	// general use in applications. This feature is provided for identifying memory leaks.
+	//
 	// Returned type: Uint
 	ContextReferenceCount ContextInfoName = C.CL_CONTEXT_REFERENCE_COUNT
 	// ContextDevices returns the list of devices and sub-devices in context.
-	//
-	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
-	// general use in applications. This feature is provided for identifying memory leaks.
 	//
 	// Returned type: []DeviceID
 	ContextDevices ContextInfoName = C.CL_CONTEXT_DEVICES
