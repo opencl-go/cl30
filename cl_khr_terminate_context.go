@@ -56,20 +56,20 @@ const (
 	// Extension: KhrTerminateContextExtensionName
 	ErrContextTerminatedKhr StatusError = C.CL_CONTEXT_TERMINATED_KHR
 
-	// DeviceTerminateCapabilityKhr represents the capability about a device to which degree it supports
+	// DeviceTerminateCapabilityKhrInfo represents the capability about a device to which degree it supports
 	// termination of their contexts.
 	//
 	// Info value type: DeviceTerminateCapabilityKhrFlags
 	// Extension: KhrTerminateContextExtensionName
-	DeviceTerminateCapabilityKhr DeviceInfoName = C.CL_DEVICE_TERMINATE_CAPABILITY_KHR
+	DeviceTerminateCapabilityKhrInfo DeviceInfoName = C.CL_DEVICE_TERMINATE_CAPABILITY_KHR
 
-	// ContextTerminateKhr represents a context property that requests to enable context termination.
+	// ContextTerminateKhrProperty represents a context property that requests to enable context termination.
 	//
 	// Use WithTermination() for convenience.
 	//
 	// Property value type: Bool
 	// Extension: KhrTerminateContextExtensionName
-	ContextTerminateKhr uintptr = C.CL_CONTEXT_TERMINATE_KHR
+	ContextTerminateKhrProperty uintptr = C.CL_CONTEXT_TERMINATE_KHR
 )
 
 // DeviceTerminateCapabilityKhrFlags describe the termination capability of the OpenCL device.
@@ -86,10 +86,10 @@ const (
 	DeviceTerminateCapabilityKhrContext DeviceTerminateCapabilityKhrFlags = 1 << 0
 )
 
-// WithTermination is a convenience function to handle the ContextTerminateKhr property.
+// WithTermination is a convenience function to create a valid ContextTerminateKhrProperty.
 // Use it in combination with CreateContext() or CreateContextFromType().
 //
 // Extension: KhrTerminateContextExtensionName
 func WithTermination(enabled bool) ContextProperty {
-	return ContextProperty{ContextTerminateKhr, uintptr(BoolFrom(enabled))}
+	return ContextProperty{ContextTerminateKhrProperty, uintptr(BoolFrom(enabled))}
 }
