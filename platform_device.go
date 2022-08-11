@@ -536,7 +536,7 @@ const (
 	// Since: 1.2
 	DeviceParentDeviceInfo DeviceInfoName = C.CL_DEVICE_PARENT_DEVICE
 	// DevicePartitionAffinityDomainInfo returns the list of supported affinity domains for partitioning the device
-	// using DevicePartitionByAffinityDomain. This is a bit-field.
+	// using DevicePartitionByAffinityDomainProperty. This is a bit-field.
 	// If the device does not support any affinity domains, a value of 0 will be returned.
 	//
 	// Returned type: DeviceAffinityDomainFlags
@@ -550,8 +550,8 @@ const (
 	// Since: 1.2
 	DevicePartitionMaxSubDevicesInfo DeviceInfoName = C.CL_DEVICE_PARTITION_MAX_SUB_DEVICES
 	// DevicePartitionPropertiesInfo returns the list of partition types supported by device.
-	// This is an array of uintptr values drawn from the list of DevicePartitionEqually, DevicePartitionByCounts,
-	// and DevicePartitionByAffinityDomain.
+	// This is an array of uintptr values drawn from the list of DevicePartitionEquallyProperty, DevicePartitionByCountsProperty,
+	// and DevicePartitionByAffinityDomainProperty.
 	// If the device cannot be partitioned (i.e. there is no partitioning scheme supported by the device that will
 	// return at least two subdevices), a value of 0 will be returned.
 	//
@@ -559,7 +559,7 @@ const (
 	// Since: 1.2
 	DevicePartitionPropertiesInfo DeviceInfoName = C.CL_DEVICE_PARTITION_PROPERTIES
 	// DevicePartitionTypeInfo returns the properties argument specified in CreateSubDevices() if device is a sub-device.
-	// In the case where the properties argument to CreateSubDevices() is DevicePartitionByAffinityDomain,
+	// In the case where the properties argument to CreateSubDevices() is DevicePartitionByAffinityDomainProperty,
 	// DeviceAffinityDomainNextPartitionable, the affinity domain used to perform the partition will be returned.
 	// This can be one of the following values:
 	//
@@ -990,7 +990,7 @@ func HostTimer(id DeviceID) (uint64, error) {
 }
 
 const (
-	// DevicePartitionEqually requests to split the aggregate device into as many smaller aggregate devices as
+	// DevicePartitionEquallyProperty requests to split the aggregate device into as many smaller aggregate devices as
 	// can be created, each containing N compute units. The value N is passed as the value accompanying this property.
 	// If N does not divide evenly into DeviceMaxComputeUnitsInfo, then the remaining compute units are not used.
 	//
@@ -998,9 +998,9 @@ const (
 	//
 	// Property value type: Uint
 	// Since: 1.2
-	DevicePartitionEqually uintptr = C.CL_DEVICE_PARTITION_EQUALLY
-	// DevicePartitionByCounts is followed by a list of compute unit counts terminated with 0 or
-	// DevicePartitionByCountsListEnd. For each non-zero count M in the list, a sub-device is created with M compute
+	DevicePartitionEquallyProperty uintptr = C.CL_DEVICE_PARTITION_EQUALLY
+	// DevicePartitionByCountsProperty is followed by a list of compute unit counts terminated with 0 or
+	// DevicePartitionByCountsListEndProperty. For each non-zero count M in the list, a sub-device is created with M compute
 	// units in it.
 	//
 	// The number of non-zero count entries in the list may not exceed DevicePartitionMaxSubDevicesInfo.
@@ -1011,12 +1011,12 @@ const (
 	//
 	// Property value type: Uint
 	// Since: 1.2
-	DevicePartitionByCounts uintptr = C.CL_DEVICE_PARTITION_BY_COUNTS
-	// DevicePartitionByCountsListEnd terminates the property value list started by DevicePartitionByCounts.
+	DevicePartitionByCountsProperty uintptr = C.CL_DEVICE_PARTITION_BY_COUNTS
+	// DevicePartitionByCountsListEndProperty terminates the property value list started by DevicePartitionByCountsProperty.
 	//
 	// Since: 1.2
-	DevicePartitionByCountsListEnd uintptr = C.CL_DEVICE_PARTITION_BY_COUNTS_LIST_END
-	// DevicePartitionByAffinityDomain splits the device into smaller aggregate devices containing one or more
+	DevicePartitionByCountsListEndProperty uintptr = C.CL_DEVICE_PARTITION_BY_COUNTS_LIST_END
+	// DevicePartitionByAffinityDomainProperty splits the device into smaller aggregate devices containing one or more
 	// compute units that all share part of a cache hierarchy. The value accompanying this property may be drawn
 	// from the constants of DeviceAffinityDomainFlags.
 	//
@@ -1024,28 +1024,28 @@ const (
 	//
 	// Property value type: DeviceAffinityDomainFlags
 	// Since: 1.2
-	DevicePartitionByAffinityDomain uintptr = C.CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN
+	DevicePartitionByAffinityDomainProperty uintptr = C.CL_DEVICE_PARTITION_BY_AFFINITY_DOMAIN
 )
 
 // DevicePartitionProperty is one entry of properties which are taken into account when creating sub-devices
 // with CreateSubDevices().
 type DevicePartitionProperty []uintptr
 
-// PartitionedEqually is a convenience function to handle the DevicePartitionEqually property.
+// PartitionedEqually is a convenience function to create a valid DevicePartitionEquallyProperty.
 // Use it in combination with CreateSubDevices().
 func PartitionedEqually(units uint) DevicePartitionProperty {
-	return DevicePartitionProperty{DevicePartitionEqually, uintptr(units)}
+	return DevicePartitionProperty{DevicePartitionEquallyProperty, uintptr(units)}
 }
 
-// PartitionedByCounts is a convenience function to handle the DevicePartitionByCounts property.
+// PartitionedByCounts is a convenience function to create a valid DevicePartitionByCountsProperty.
 // Use it in combination with CreateSubDevices().
 func PartitionedByCounts(units []uint) DevicePartitionProperty {
 	values := make(DevicePartitionProperty, 0, len(units)+2)
-	values = append(values, DevicePartitionByCounts)
+	values = append(values, DevicePartitionByCountsProperty)
 	for _, unit := range units {
 		values = append(values, uintptr(unit))
 	}
-	values = append(values, DevicePartitionByCountsListEnd)
+	values = append(values, DevicePartitionByCountsListEndProperty)
 	return values
 }
 
@@ -1088,10 +1088,10 @@ const (
 	DeviceAffinityDomainNextPartitionable DeviceAffinityDomainFlags = C.CL_DEVICE_AFFINITY_DOMAIN_NEXT_PARTITIONABLE
 )
 
-// PartitionedByAffinityDomain is a convenience function to handle the DevicePartitionByAffinityDomain property.
+// PartitionedByAffinityDomain is a convenience function to create a valid DevicePartitionByAffinityDomainProperty.
 // Use it in combination with CreateSubDevices().
 func PartitionedByAffinityDomain(domain DeviceAffinityDomainFlags) DevicePartitionProperty {
-	return DevicePartitionProperty{DevicePartitionByAffinityDomain, uintptr(domain)}
+	return DevicePartitionProperty{DevicePartitionByAffinityDomainProperty, uintptr(domain)}
 }
 
 // CreateSubDevices creates an array of sub-devices that each reference a non-intersecting set of compute units within
