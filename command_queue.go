@@ -28,11 +28,11 @@ const (
 	QueuePropertiesProperty uint64 = C.CL_QUEUE_PROPERTIES
 	// QueueSizeProperty specifies the size of the device queue in bytes.
 	// This can only be specified if QueueOnDevice is set in QueuePropertiesProperty.
-	// This must be a value less than or equal DeviceQueueOnDeviceMaxSize.
+	// This must be a value less than or equal DeviceQueueOnDeviceMaxSizeInfo.
 	//
-	// For best performance, this should be less than or equal DeviceQueueOnDevicePreferredSize.
+	// For best performance, this should be less than or equal DeviceQueueOnDevicePreferredSizeInfo.
 	//
-	// If QueueSizeProperty is not specified, the device queue is created with DeviceQueueOnDevicePreferredSize as
+	// If QueueSizeProperty is not specified, the device queue is created with DeviceQueueOnDevicePreferredSizeInfo as
 	// the size of the queue.
 	//
 	// Property value type: Uint
@@ -40,7 +40,7 @@ const (
 	QueueSizeProperty uint64 = C.CL_QUEUE_SIZE
 )
 
-// CommandQueuePropertiesFlags is used to determine DeviceQueueOnDeviceProperties and DeviceQueueOnHostProperties
+// CommandQueuePropertiesFlags is used to determine DeviceQueueOnDevicePropertiesInfo and DeviceQueueOnHostPropertiesInfo
 // with DeviceInfo(), as well as QueuePropertiesProperty for CreateCommandQueueWithProperties().
 type CommandQueuePropertiesFlags C.cl_command_queue_properties
 
