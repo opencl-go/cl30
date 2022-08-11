@@ -891,19 +891,6 @@ const (
 	DeviceLocalMemTypeGlobal DeviceLocalMemTypeEnum = C.CL_GLOBAL
 )
 
-// CommandQueuePropertiesFlags is used to determine DeviceQueueOnDeviceProperties and DeviceQueueOnHostProperties
-// with DeviceInfo().
-type CommandQueuePropertiesFlags C.cl_command_queue_properties
-
-// These are the possible values for CommandQueuePropertiesFlags.
-// QueueOnDevice and QueueOnDeviceDefault exist Since: 2.0.
-const (
-	QueueOutOfOrderExecModeEnable CommandQueuePropertiesFlags = C.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE
-	QueueProfilingEnable          CommandQueuePropertiesFlags = C.CL_QUEUE_PROFILING_ENABLE
-	QueueOnDevice                 CommandQueuePropertiesFlags = C.CL_QUEUE_ON_DEVICE
-	QueueOnDeviceDefault          CommandQueuePropertiesFlags = C.CL_QUEUE_ON_DEVICE_DEFAULT
-)
-
 // DeviceSvmCapabilitiesFlags is used to determine DeviceSvmCapabilities with DeviceInfo().
 type DeviceSvmCapabilitiesFlags C.cl_device_svm_capabilities
 
