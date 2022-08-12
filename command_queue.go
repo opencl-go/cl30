@@ -45,7 +45,7 @@ const (
 )
 
 // CommandQueuePropertiesFlags is used to determine DeviceQueueOnDevicePropertiesInfo and DeviceQueueOnHostPropertiesInfo
-// with DeviceInfo(), as well as QueuePropertiesProperty for CreateCommandQueueWithProperties().
+// with DeviceInfo(), as well as QueuePropertiesProperty for CreateCommandQueueWithProperties() and CreateCommandQueue().
 type CommandQueuePropertiesFlags C.cl_command_queue_properties
 
 const (
@@ -113,7 +113,7 @@ func CreateCommandQueueWithProperties(context Context, deviceID DeviceID, proper
 
 // RetainCommandQueue increments the commandQueue reference count.
 //
-// CreateCommandQueueWithProperties() performs an implicit retain.
+// CreateCommandQueueWithProperties() and CreateCommandQueue() perform an implicit retain.
 // This is very helpful for 3rd party libraries, which typically get a command-queue passed to them by the application.
 // However, it is possible that the application may delete the command-queue without informing the library.
 // Allowing functions to attach to (i.e. retain) and release a command-queue solves the problem of a command-queue
