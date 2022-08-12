@@ -32,13 +32,13 @@ func (c Context) String() string {
 }
 
 const (
-	// ContextPlatform specifies the platform to use.
+	// ContextPlatformProperty specifies the platform to use.
 	//
 	// Use OnPlatform() for convenience.
 	//
 	// Property value type: PlatformID
-	ContextPlatform uintptr = C.CL_CONTEXT_PLATFORM
-	// ContextInteropUserSync specifies whether the user is responsible for synchronization between OpenCL and
+	ContextPlatformProperty uintptr = C.CL_CONTEXT_PLATFORM
+	// ContextInteropUserSyncProperty specifies whether the user is responsible for synchronization between OpenCL and
 	// other APIs. Please refer to the specific sections in the OpenCL Extension Specification that describe sharing
 	// with other APIs for restrictions on using this flag.
 	//
@@ -46,22 +46,22 @@ const (
 	//
 	// Property value type: Bool
 	// Since: 1.2
-	ContextInteropUserSync uintptr = C.CL_CONTEXT_INTEROP_USER_SYNC
+	ContextInteropUserSyncProperty uintptr = C.CL_CONTEXT_INTEROP_USER_SYNC
 )
 
 // ContextProperty is one entry of properties which are taken into account when creating context objects.
 type ContextProperty []uintptr
 
-// OnPlatform is a convenience function to handle the ContextPlatform property.
+// OnPlatform is a convenience function to create a valid ContextPlatformProperty.
 // Use it in combination with CreateContext() or CreateContextFromType().
 func OnPlatform(id PlatformID) ContextProperty {
-	return ContextProperty{ContextPlatform, uintptr(id)}
+	return ContextProperty{ContextPlatformProperty, uintptr(id)}
 }
 
-// WithInteropUserSync is a convenience function to handle the ContextInteropUserSync property.
+// WithInteropUserSync is a convenience function to create a valid ContextInteropUserSyncProperty.
 // Use it in combination with CreateContext() or CreateContextFromType().
 func WithInteropUserSync(value bool) ContextProperty {
-	return ContextProperty{ContextInteropUserSync, uintptr(BoolFrom(value))}
+	return ContextProperty{ContextInteropUserSyncProperty, uintptr(BoolFrom(value))}
 }
 
 // CreateContext creates an OpenCL context for the specified devices.
@@ -178,29 +178,29 @@ func ReleaseContext(context Context) error {
 type ContextInfoName C.cl_context_info
 
 const (
-	// ContextReferenceCount returns the context reference count.
-	//
-	// Returned type: Uint
-	ContextReferenceCount ContextInfoName = C.CL_CONTEXT_REFERENCE_COUNT
-	// ContextDevices returns the list of devices and sub-devices in context.
+	// ContextReferenceCountInfo returns the context reference count.
 	//
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
+	// Returned type: Uint
+	ContextReferenceCountInfo ContextInfoName = C.CL_CONTEXT_REFERENCE_COUNT
+	// ContextDevicesInfo returns the list of devices and sub-devices in context.
+	//
 	// Returned type: []DeviceID
-	ContextDevices ContextInfoName = C.CL_CONTEXT_DEVICES
-	// ContextNumDevices returns the number of devices in context.
+	ContextDevicesInfo ContextInfoName = C.CL_CONTEXT_DEVICES
+	// ContextNumDevicesInfo returns the number of devices in context.
 	//
 	// Returned type: Uint
 	// Since: 1.1
-	ContextNumDevices ContextInfoName = C.CL_CONTEXT_NUM_DEVICES
-	// ContextProperties returns the properties argument specified in CreateContext() or CreateContextFromType().
+	ContextNumDevicesInfo ContextInfoName = C.CL_CONTEXT_NUM_DEVICES
+	// ContextPropertiesInfo returns the properties argument specified in CreateContext() or CreateContextFromType().
 	//
 	// The returned list is the concatenated list of all the properties provided at creation.
 	// This list also includes the terminating zero value.
 	//
 	// Returned type: []uintptr
-	ContextProperties ContextInfoName = C.CL_CONTEXT_PROPERTIES
+	ContextPropertiesInfo ContextInfoName = C.CL_CONTEXT_PROPERTIES
 )
 
 // ContextInfo queries information about a context.

@@ -48,15 +48,15 @@ func PlatformIDs() ([]PlatformID, error) {
 type PlatformInfoName C.cl_platform_info
 
 const (
-	// PlatformName refers to a human-readable string that identifies the platform.
+	// PlatformNameInfo refers to a human-readable string that identifies the platform.
 	//
 	// Returned type: string
-	PlatformName PlatformInfoName = C.CL_PLATFORM_NAME
-	// PlatformVendor refers to a human-readable string that identifies the vendor of the platform.
+	PlatformNameInfo PlatformInfoName = C.CL_PLATFORM_NAME
+	// PlatformVendorInfo refers to a human-readable string that identifies the vendor of the platform.
 	//
 	// Returned type: string
-	PlatformVendor PlatformInfoName = C.CL_PLATFORM_VENDOR
-	// PlatformProfile refers to the profile name supported by the implementation.
+	PlatformVendorInfo PlatformInfoName = C.CL_PLATFORM_VENDOR
+	// PlatformProfileInfo refers to the profile name supported by the implementation.
 	// The profile name returned can be one of the following strings:
 	//
 	// "FULL_PROFILE" - if the implementation supports the OpenCL specification (functionality defined as part of the
@@ -66,40 +66,40 @@ const (
 	// to be a subset for each version of OpenCL.
 	//
 	// Returned type: string
-	PlatformProfile PlatformInfoName = C.CL_PLATFORM_PROFILE
-	// PlatformVersion refers to the OpenCL version supported by the implementation.
+	PlatformProfileInfo PlatformInfoName = C.CL_PLATFORM_PROFILE
+	// PlatformVersionInfo refers to the OpenCL version supported by the implementation.
 	// This version string has the following format:
 	//
 	// OpenCL<space><major_version.minor_version><space><platform-specific information>
 	//
 	// Returned type: string
-	PlatformVersion PlatformInfoName = C.CL_PLATFORM_VERSION
-	// PlatformNumericVersion refers to the detailed (major, minor, patch) version supported by the platform.
-	// The major and minor version numbers returned must match those returned via PlatformVersion.
+	PlatformVersionInfo PlatformInfoName = C.CL_PLATFORM_VERSION
+	// PlatformNumericVersionInfo refers to the detailed (major, minor, patch) version supported by the platform.
+	// The major and minor version numbers returned must match those returned via PlatformVersionInfo.
 	//
 	// Returned type: Version
 	// Since: 3.0
-	PlatformNumericVersion PlatformInfoName = C.CL_PLATFORM_NUMERIC_VERSION
-	// PlatformExtensions refers to a space separated list of extension names (the extension names themselves do not
+	PlatformNumericVersionInfo PlatformInfoName = C.CL_PLATFORM_NUMERIC_VERSION
+	// PlatformExtensionsInfo refers to a space separated list of extension names (the extension names themselves do not
 	// contain any spaces) supported by the platform. Each extension that is supported by all devices associated with
 	// this platform must be reported here.
 	//
 	// Returned type: string
-	PlatformExtensions PlatformInfoName = C.CL_PLATFORM_EXTENSIONS
-	// PlatformExtensionsWithVersion refers to an array of description (name and version) structures that lists all
+	PlatformExtensionsInfo PlatformInfoName = C.CL_PLATFORM_EXTENSIONS
+	// PlatformExtensionsWithVersionInfo refers to an array of description (name and version) structures that lists all
 	// the extensions supported by the platform. The same extension name must not be reported more than once.
-	// The list of extensions reported must match the list reported via PlatformExtensions.
+	// The list of extensions reported must match the list reported via PlatformExtensionsInfo.
 	//
 	// Returned type: []NameVersion
 	// Since: 3.0
-	PlatformExtensionsWithVersion PlatformInfoName = C.CL_PLATFORM_EXTENSIONS_WITH_VERSION
-	// PlatformHostTimerResolution refers to the resolution of the host timer in nanoseconds as used by
+	PlatformExtensionsWithVersionInfo PlatformInfoName = C.CL_PLATFORM_EXTENSIONS_WITH_VERSION
+	// PlatformHostTimerResolutionInfo refers to the resolution of the host timer in nanoseconds as used by
 	// DeviceAndHostTimer() and HostTimer().
 	// This value must be 0 for devices that do not support device and host timer synchronization.
 	//
 	// Returned type: uint64
 	// Since: 2.1
-	PlatformHostTimerResolution PlatformInfoName = C.CL_PLATFORM_HOST_TIMER_RESOLUTION
+	PlatformHostTimerResolutionInfo PlatformInfoName = C.CL_PLATFORM_HOST_TIMER_RESOLUTION
 )
 
 // PlatformInfo queries information about an OpenCL platform.
@@ -147,7 +147,7 @@ func PlatformInfoString(id PlatformID, paramName PlatformInfoName) (string, erro
 // platform is not a valid platform.
 // A non-nil return value for ExtensionFunctionAddressForPlatform() does not guarantee that an extension function
 // is actually supported by the platform. The application must also make a corresponding query using
-// PlatformInfo(platform, PlatformExtensions, ...) or DeviceInfo(device, DeviceExtensions, ...) to determine
+// PlatformInfo(platform, PlatformExtensionsInfo, ...) or DeviceInfo(device, DeviceExtensionsInfo, ...) to determine
 // if an extension is supported by the OpenCL implementation.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetExtensionFunctionAddressForPlatform.html
