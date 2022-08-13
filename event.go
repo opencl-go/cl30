@@ -288,6 +288,7 @@ const (
 	// ProfilingCommandCompleteInfo describes the current device time counter in nanoseconds when the command identified
 	// by the event and any child commands enqueued by this command on the device have finished execution.
 	//
+	// Returned type: uint64
 	// Since: 2.0
 	ProfilingCommandCompleteInfo EventProfilingInfoName = C.CL_PROFILING_COMMAND_COMPLETE
 )
