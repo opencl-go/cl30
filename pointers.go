@@ -45,4 +45,5 @@ func (data userData) Delete() {
 	h := cgo.Handle(*data.ptr)
 	h.Delete()
 	C.free(unsafe.Pointer(data.ptr))
+	data.ptr = nil
 }

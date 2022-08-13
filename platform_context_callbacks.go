@@ -2,14 +2,10 @@ package cl30
 
 import (
 	"sync"
-	"sync/atomic"
 	"unsafe"
 )
 
 // #include "api.h"
-// extern CL_CALLBACK void cl30CContextErrorCallback(char const *errorInfo,
-//	                                                 void const *privateInfoPtr, size_t privateInfoLen,
-//                                                   intptr_t userData);
 import "C"
 
 // ContextErrorHandler is informed about an error that occurred within the processing of a context.
@@ -32,62 +28,57 @@ func (handler ContextErrorHandlerFunc) Handle(errorInfo string, privateInfo []by
 // Create and register a new callback with NewContextErrorCallback().
 // The callback is a globally registered resource that must be released with Release() when it is no longer needed.
 type ContextErrorCallback struct {
-	key     uintptr
-	handler ContextErrorHandler
+	userData userData
+	handler  ContextErrorHandler
 }
-
-// ErrContextErrorCallbackKeySpaceExhausted is returned from NewContextErrorCallback() in case
-// no more callback instances can be registered.
-const ErrContextErrorCallbackKeySpaceExhausted WrapperError = "key space exhausted"
 
 // NewContextErrorCallback creates and registers a new callback.
 //
-// As this is a globally registered resource, registration may fail if the internal lookup key space is
-// exhausted. This key space is based on uintptr, so it varies by system when this is exhausted.
+// As this is a globally registered resource, registration may fail if memory is exhausted.
 //
 // The provided handler can be called from other threads from within the OpenCL runtime.
 func NewContextErrorCallback(handler ContextErrorHandler) (*ContextErrorCallback, error) {
-	key := atomic.AddUintptr(&contextErrorCallbackCounter, 1)
-	if key == 0 {
-		return nil, ErrContextErrorCallbackKeySpaceExhausted
+	handlerUserData, err := userDataFor(handler)
+	if err != nil {
+		return nil, err
 	}
 	cb := &ContextErrorCallback{
-		key:     key,
-		handler: handler,
+		userData: handlerUserData,
+		handler:  handler,
 	}
 	contextErrorCallbackMutex.Lock()
 	defer contextErrorCallbackMutex.Unlock()
-	contextErrorCallbacksByKey[key] = cb
+	contextErrorCallbacksByPtr[handlerUserData.ptr] = cb
 	return cb, nil
 }
 
 // Release removes the registered callback from the system. When this function returns, the assigned
 // handler will no longer be called.
+//
+// In case you release the error callback before the associated context is destroyed,
+// there is a slight chance for a later, newly created error callback to be called for that older context.
+// This can happen if the allocated low-level memory block that holds the Go handle receives the same pointer as the
+// previous callback had.
 func (cb *ContextErrorCallback) Release() {
-	if (cb == nil) || (cb.key == 0) {
+	if (cb == nil) || (cb.userData.ptr == nil) {
 		return
 	}
 	contextErrorCallbackMutex.Lock()
 	defer contextErrorCallbackMutex.Unlock()
-	delete(contextErrorCallbacksByKey, cb.key)
-	cb.key = 0
+	delete(contextErrorCallbacksByPtr, cb.userData.ptr)
+	cb.userData.Delete()
 }
 
 var (
-	contextErrorCallbackCounter uintptr
-	contextErrorCallbackMutex   = sync.RWMutex{}
-	contextErrorCallbacksByKey  = map[uintptr]*ContextErrorCallback{}
+	contextErrorCallbackMutex  = sync.RWMutex{}
+	contextErrorCallbacksByPtr = map[*C.uintptr_t]*ContextErrorCallback{}
 )
 
-func cContextErrorCallbackFunc() unsafe.Pointer {
-	return C.cl30CContextErrorCallback
-}
-
 //export cl30GoContextErrorCallback
-func cl30GoContextErrorCallback(errorInfo *C.char, privateInfoPtr *C.uint8_t, privateInfoLen C.size_t, key C.intptr_t) {
+func cl30GoContextErrorCallback(errorInfo *C.char, privateInfoPtr *C.uint8_t, privateInfoLen C.size_t, key *C.uintptr_t) {
 	contextErrorCallbackMutex.RLock()
 	defer contextErrorCallbackMutex.RUnlock()
-	cb, known := contextErrorCallbacksByKey[uintptr(key)]
+	cb, known := contextErrorCallbacksByPtr[key]
 	if !known {
 		return
 	}

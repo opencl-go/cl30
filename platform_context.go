@@ -3,11 +3,11 @@ package cl30
 // #include "api.h"
 // extern cl_context cl30CreateContext(cl_context_properties *properties,
 //     cl_uint numDevices, cl_device_id *devices,
-//     void *notify, intptr_t userData,
+//     uintptr_t *userData,
 //     cl_int *errcodeReturn);
 // extern cl_context cl30CreateContextFromType(cl_context_properties *properties,
 //     cl_device_type deviceType,
-//     void *notify, intptr_t userData,
+//     uintptr_t *userData,
 //     cl_int *errcodeReturn);
 // extern cl_int cl30SetContextDestructorCallback(cl_context context, uintptr_t *userData);
 import "C"
@@ -86,18 +86,16 @@ func CreateContext(deviceIds []DeviceID, callback *ContextErrorCallback, propert
 	if len(deviceIds) > 0 {
 		rawDeviceIds = unsafe.Pointer(&deviceIds[0])
 	}
-	var callbackFunc unsafe.Pointer
-	var callbackKey uintptr
+	callbackKey := (*C.uintptr_t)(nil)
 	if callback != nil {
-		callbackFunc = cContextErrorCallbackFunc()
-		callbackKey = callback.key
+		callbackKey = callback.userData.ptr
 	}
 	var status C.cl_int
 	context := C.cl30CreateContext(
 		(*C.cl_context_properties)(rawProperties),
 		C.uint(len(deviceIds)),
 		(*C.cl_device_id)(rawDeviceIds),
-		callbackFunc, (C.intptr_t)(callbackKey),
+		callbackKey,
 		&status)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -125,17 +123,15 @@ func CreateContextFromType(deviceType DeviceTypeFlags, callback *ContextErrorCal
 		rawPropertyList = append(rawPropertyList, 0)
 		rawProperties = unsafe.Pointer(&rawPropertyList[0])
 	}
-	var callbackFunc unsafe.Pointer
-	var callbackKey uintptr
+	callbackKey := (*C.uintptr_t)(nil)
 	if callback != nil {
-		callbackFunc = cContextErrorCallbackFunc()
-		callbackKey = callback.key
+		callbackKey = callback.userData.ptr
 	}
 	var status C.cl_int
 	context := C.cl30CreateContextFromType(
 		(*C.cl_context_properties)(rawProperties),
 		C.cl_device_type(deviceType),
-		callbackFunc, (C.intptr_t)(callbackKey),
+		callbackKey,
 		&status)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
