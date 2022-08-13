@@ -1,7 +1,6 @@
 package cl30
 
 import (
-	"runtime/cgo"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -11,7 +10,6 @@ import (
 // extern CL_CALLBACK void cl30CContextErrorCallback(char const *errorInfo,
 //	                                                 void const *privateInfoPtr, size_t privateInfoLen,
 //                                                   intptr_t userData);
-// extern CL_CALLBACK void cl30CContextDestructorCallback(cl_context context, void *userData);
 import "C"
 
 // ContextErrorHandler is informed about an error that occurred within the processing of a context.
@@ -97,14 +95,10 @@ func cl30GoContextErrorCallback(errorInfo *C.char, privateInfoPtr *C.uint8_t, pr
 	cb.handler.Handle(C.GoString(errorInfo), privateInfo)
 }
 
-func cContextDestructorCallbackFunc() unsafe.Pointer {
-	return C.cl30CContextDestructorCallback
-}
-
 //export cl30GoContextDestructorCallback
-func cl30GoContextDestructorCallback(context Context, userData unsafe.Pointer) {
-	handle := *(*cgo.Handle)(userData)
-	callback := handle.Value().(func())
-	handle.Delete()
+func cl30GoContextDestructorCallback(_ Context, userData *C.intptr_t) {
+	callbackUserData := userDataFrom(userData)
+	callback := callbackUserData.Value().(func())
+	callbackUserData.Delete()
 	callback()
 }

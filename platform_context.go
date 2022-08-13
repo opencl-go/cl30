@@ -9,11 +9,10 @@ package cl30
 //     cl_device_type deviceType,
 //     void *notify, intptr_t userData,
 //     cl_int *errcodeReturn);
-// extern cl_int cl30SetContextDestructorCallback(cl_context context, void *notify, void *userData);
+// extern cl_int cl30SetContextDestructorCallback(cl_context context, intptr_t *userData);
 import "C"
 import (
 	"fmt"
-	"runtime/cgo"
 	"unsafe"
 )
 
@@ -251,13 +250,13 @@ func ContextInfoString(context Context, paramName ContextInfoName) (string, erro
 // Since: 3.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clSetContextDestructorCallback.html
 func SetContextDestructorCallback(context Context, callback func()) error {
-	callbackHandle := cgo.NewHandle(callback)
-	status := C.cl30SetContextDestructorCallback(
-		context.handle(),
-		cContextDestructorCallbackFunc(),
-		unsafe.Pointer(&callbackHandle)) //nolint: gocritic
+	callbackUserData, err := userDataFor(callback)
+	if err != nil {
+		return err
+	}
+	status := C.cl30SetContextDestructorCallback(context.handle(), callbackUserData.ptr)
 	if status != C.CL_SUCCESS {
-		callbackHandle.Delete()
+		callbackUserData.Delete()
 		return StatusError(status)
 	}
 	return nil

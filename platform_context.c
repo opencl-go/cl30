@@ -29,16 +29,14 @@ cl_context cl30CreateContextFromType(cl_context_properties *properties,
         errcodeReturn);
 }
 
-cl_int cl30SetContextDestructorCallback(cl_context context, void *notify, void *userData)
+extern void cl30GoContextDestructorCallback(cl_context, intptr_t *);
+
+static CL_CALLBACK void cl30CContextDestructorCallback(cl_context context, void *userData)
 {
-    return clSetContextDestructorCallback(context,
-        (void (CL_CALLBACK *)(cl_context, void *))(notify),
-        userData);
+    cl30GoContextDestructorCallback(context, (intptr_t *)(userData));
 }
 
-extern void cl30GoContextDestructorCallback(cl_context, void*);
-
-CL_CALLBACK void cl30CContextDestructorCallback(cl_context context, void *userData)
+cl_int cl30SetContextDestructorCallback(cl_context context, intptr_t *userData)
 {
-    cl30GoContextDestructorCallback(context, userData);
+    return clSetContextDestructorCallback(context, cl30CContextDestructorCallback, userData);
 }
