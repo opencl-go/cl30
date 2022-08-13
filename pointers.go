@@ -16,20 +16,20 @@ import (
 // to be stored in an allocated memory block. Incidentally, this memory block has then a pointer that can
 // be used as actual C-land user data.
 type userData struct {
-	ptr *C.intptr_t
+	ptr *C.uintptr_t
 }
 
 func userDataFor(v any) (userData, error) {
-	ptr := (*C.intptr_t)(C.malloc((C.size_t)(unsafe.Sizeof(C.intptr_t(0)))))
+	ptr := (*C.uintptr_t)(C.malloc((C.size_t)(unsafe.Sizeof(C.uintptr_t(0)))))
 	if ptr == nil {
 		return userData{}, ErrOutOfMemory
 	}
 	h := cgo.NewHandle(v)
-	*ptr = C.intptr_t(h)
+	*ptr = C.uintptr_t(h)
 	return userData{ptr: ptr}, nil
 }
 
-func userDataFrom(ptr *C.intptr_t) userData {
+func userDataFrom(ptr *C.uintptr_t) userData {
 	return userData{ptr: ptr}
 }
 

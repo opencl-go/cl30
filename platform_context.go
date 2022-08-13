@@ -9,7 +9,7 @@ package cl30
 //     cl_device_type deviceType,
 //     void *notify, intptr_t userData,
 //     cl_int *errcodeReturn);
-// extern cl_int cl30SetContextDestructorCallback(cl_context context, intptr_t *userData);
+// extern cl_int cl30SetContextDestructorCallback(cl_context context, uintptr_t *userData);
 import "C"
 import (
 	"fmt"

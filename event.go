@@ -1,7 +1,7 @@
 package cl30
 
 // #include "api.h"
-// extern cl_int cl30SetEventCallback(cl_event event, cl_int callbackType, intptr_t *userData);
+// extern cl_int cl30SetEventCallback(cl_event event, cl_int callbackType, uintptr_t *userData);
 import "C"
 import (
 	"fmt"
@@ -340,7 +340,7 @@ func SetEventCallback(event Event, callbackType EventCommandExecutionStatus, cal
 }
 
 //export cl30GoEventCallback
-func cl30GoEventCallback(_ Event, commandStatus C.cl_int, userData *C.intptr_t) {
+func cl30GoEventCallback(_ Event, commandStatus C.cl_int, userData *C.uintptr_t) {
 	callbackUserData := userDataFrom(userData)
 	callback := callbackUserData.Value().(func(error))
 	callbackUserData.Delete()

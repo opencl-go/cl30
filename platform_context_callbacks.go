@@ -96,7 +96,7 @@ func cl30GoContextErrorCallback(errorInfo *C.char, privateInfoPtr *C.uint8_t, pr
 }
 
 //export cl30GoContextDestructorCallback
-func cl30GoContextDestructorCallback(_ Context, userData *C.intptr_t) {
+func cl30GoContextDestructorCallback(_ Context, userData *C.uintptr_t) {
 	callbackUserData := userDataFrom(userData)
 	callback := callbackUserData.Value().(func())
 	callbackUserData.Delete()
