@@ -4,7 +4,7 @@ extern void cl30GoContextErrorCallback(char *, uint8_t *, size_t, uintptr_t *);
 
 static CL_CALLBACK void cl30CContextErrorCallback(char const *errorInfo,
     void const *privateInfoPtr, size_t privateInfoLen,
-    uintptr_t *userData)
+    void *userData)
 {
     cl30GoContextErrorCallback((char *)(errorInfo), (uint8_t *)(privateInfoPtr), privateInfoLen, (uintptr_t *)(userData));
 }
@@ -29,14 +29,14 @@ cl_context cl30CreateContextFromType(cl_context_properties *properties,
         errcodeReturn);
 }
 
-extern void cl30GoContextDestructorCallback(cl_context, intptr_t *);
+extern void cl30GoContextDestructorCallback(cl_context, uintptr_t *);
 
 static CL_CALLBACK void cl30CContextDestructorCallback(cl_context context, void *userData)
 {
-    cl30GoContextDestructorCallback(context, (intptr_t *)(userData));
+    cl30GoContextDestructorCallback(context, (uintptr_t *)(userData));
 }
 
-cl_int cl30SetContextDestructorCallback(cl_context context, intptr_t *userData)
+cl_int cl30SetContextDestructorCallback(cl_context context, uintptr_t *userData)
 {
     return clSetContextDestructorCallback(context, cl30CContextDestructorCallback, userData);
 }
