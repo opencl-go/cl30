@@ -21,6 +21,9 @@ func (mem MemObject) String() string {
 	return fmt.Sprintf("0x%X", uintptr(mem))
 }
 
+// MemProperty is one entry of properties which are taken into account when creating memory objects.
+type MemProperty []uint64
+
 // RetainMemObject increments the memory object reference count.
 //
 // Function that create a memory object perform an implicit retain.
@@ -204,6 +207,25 @@ func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uint, p
 	}
 	return uint(sizeReturn), nil
 }
+
+// MapFlags describe how a memory object shall be mapped into host memory.
+type MapFlags C.cl_map_flags
+
+const (
+	// MapRead specifies that the region being mapped in the memory object is being mapped for reading.
+	MapRead MapFlags = C.CL_MAP_READ
+	// MapWrite specifies that the region being mapped in the memory object is being mapped for writing.
+	MapWrite MapFlags = C.CL_MAP_WRITE
+	// MapWriteInvalidateRegion specifies that the region being mapped in the memory object is being mapped for writing.
+	//
+	// The contents of the region being mapped are to be discarded. This is typically the case when the region
+	// being mapped is overwritten by the host. This flag allows the implementation to no longer guarantee that the
+	// pointer returned by EnqueueMapBuffer() (EnqueueMapImage()) contains the latest bits in the region being mapped
+	// which can be a significant performance enhancement.
+	//
+	// Since: 1.2
+	MapWriteInvalidateRegion MapFlags = C.CL_MAP_WRITE_INVALIDATE_REGION
+)
 
 // EnqueueUnmapMemObject enqueues a command to unmap a previously mapped region of a memory object.
 //
