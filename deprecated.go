@@ -23,3 +23,21 @@ func CreateCommandQueue(context Context, deviceID DeviceID, properties CommandQu
 	}
 	return CommandQueue(*((*uintptr)(unsafe.Pointer(&commandQueue)))), nil
 }
+
+// CreateSampler creates a sampler object.
+//
+// Deprecated: 1.2; Use CreateSamplerWithProperties() instead.
+// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateSampler.html
+func CreateSampler(context Context, normalizedCoords bool, addressingMode SamplerAddressingMode, filterMode SamplerFilterMode) (Sampler, error) {
+	var status C.cl_int
+	sampler := C.clCreateSampler(
+		context.handle(),
+		C.cl_bool(BoolFrom(normalizedCoords)),
+		C.cl_addressing_mode(addressingMode),
+		C.cl_filter_mode(filterMode),
+		&status)
+	if status != C.CL_SUCCESS {
+		return 0, StatusError(status)
+	}
+	return Sampler(*((*uintptr)(unsafe.Pointer(&sampler)))), nil
+}

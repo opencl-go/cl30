@@ -171,7 +171,7 @@ const (
 	QueuePropertiesInfo CommandQueueInfoName = C.CL_QUEUE_PROPERTIES
 	// QueuePropertiesArrayInfo returns the properties argument specified in CreateCommandQueueWithProperties().
 	//
-	// Returned type: []CommandQueueProperty
+	// Returned type: []uint64
 	// Since: 3.0
 	QueuePropertiesArrayInfo CommandQueueInfoName = C.CL_QUEUE_PROPERTIES_ARRAY
 	// QueueSizeInfo returns the size of the device command-queue. To be considered valid for this query,
