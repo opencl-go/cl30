@@ -156,3 +156,22 @@ func ExtensionFunctionAddressForPlatform(id PlatformID, functionName string) uns
 	defer C.free(unsafe.Pointer(rawName))
 	return C.clGetExtensionFunctionAddressForPlatform(id.handle(), rawName)
 }
+
+// UnloadPlatformCompiler allows the implementation to release the resources allocated by the OpenCL compiler for
+// a platform.
+//
+// This function allows the implementation to release the resources allocated by the OpenCL compiler for platform.
+// This is a hint from the application and does not guarantee that the compiler will not be used in the future or
+// that the compiler will actually be unloaded by the implementation.
+// Calls to BuildProgram(), CompileProgram(), or LinkProgram() after UnloadPlatformCompiler() will reload the compiler,
+// if necessary, to build the appropriate program executable.
+//
+// Since: 1.2
+// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clUnloadPlatformCompiler.html
+func UnloadPlatformCompiler(id PlatformID) error {
+	status := C.clUnloadPlatformCompiler(id.handle())
+	if status != C.CL_SUCCESS {
+		return StatusError(status)
+	}
+	return nil
+}
