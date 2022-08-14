@@ -357,15 +357,15 @@ func cl30GoEventCallback(_ Event, commandStatus C.cl_int, userData *C.uintptr_t)
 //
 // Since: 1.2
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueMarkerWithWaitList.html
-func EnqueueMarkerWithWaitList(commandQueue CommandQueue, events []Event, event *Event) error {
-	var rawEvents unsafe.Pointer
-	if len(events) > 0 {
-		rawEvents = unsafe.Pointer(&events[0])
+func EnqueueMarkerWithWaitList(commandQueue CommandQueue, waitList []Event, event *Event) error {
+	var rawWaitList unsafe.Pointer
+	if len(waitList) > 0 {
+		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
 	status := C.clEnqueueMarkerWithWaitList(
 		commandQueue.handle(),
-		C.cl_uint(len(events)),
-		(*C.cl_event)(rawEvents),
+		C.cl_uint(len(waitList)),
+		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
@@ -381,15 +381,15 @@ func EnqueueMarkerWithWaitList(commandQueue CommandQueue, events []Event, event 
 //
 // Since: 1.2
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueBarrierWithWaitList.html
-func EnqueueBarrierWithWaitList(commandQueue CommandQueue, events []Event, event *Event) error {
-	var rawEvents unsafe.Pointer
-	if len(events) > 0 {
-		rawEvents = unsafe.Pointer(&events[0])
+func EnqueueBarrierWithWaitList(commandQueue CommandQueue, waitList []Event, event *Event) error {
+	var rawWaitList unsafe.Pointer
+	if len(waitList) > 0 {
+		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
 	status := C.clEnqueueBarrierWithWaitList(
 		commandQueue.handle(),
-		C.cl_uint(len(events)),
-		(*C.cl_event)(rawEvents),
+		C.cl_uint(len(waitList)),
+		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
 	if status != C.CL_SUCCESS {
 		return StatusError(status)

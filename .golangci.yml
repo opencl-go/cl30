@@ -10,7 +10,7 @@ linters:
     - deadcode
     - depguard
     - dogsled
-    - dupl
+    # - dupl # Disabled because tripping on Read/Write similarities
     - durationcheck
     - errcheck
     - errorlint
