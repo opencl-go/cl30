@@ -213,14 +213,14 @@ const (
 	KernelFunctionNameInfo KernelInfoName = C.CL_KERNEL_FUNCTION_NAME
 	// KernelNumArgsInfo returns the number of arguments to kernel.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	KernelNumArgsInfo KernelInfoName = C.CL_KERNEL_NUM_ARGS
 	// KernelReferenceCountInfo returns the kernel reference count.
 	//
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for general
 	// use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	KernelReferenceCountInfo KernelInfoName = C.CL_KERNEL_REFERENCE_COUNT
 	// KernelContextInfo returns the context associated with kernel.
 	//
@@ -249,7 +249,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use KernelInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelInfo.html
-func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelInfo(
 		kernel.handle(),
@@ -260,7 +260,7 @@ func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uint, paramVa
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // KernelInfoString is a convenience method for KernelInfo() to query information values that are
@@ -269,7 +269,7 @@ func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uint, paramVa
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func KernelInfoString(kernel Kernel, paramName KernelInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return KernelInfo(kernel, paramName, paramSize, paramValue)
 	})
 }
@@ -342,7 +342,7 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelWorkGroupInfo.html
-func KernelWorkGroupInfo(kernel Kernel, device DeviceID, paramName KernelWorkGroupInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func KernelWorkGroupInfo(kernel Kernel, device DeviceID, paramName KernelWorkGroupInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelWorkGroupInfo(
 		kernel.handle(),
@@ -354,7 +354,7 @@ func KernelWorkGroupInfo(kernel Kernel, device DeviceID, paramName KernelWorkGro
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // KernelArgInfoName identifies properties of a kernel argument, which can be queried with KernelArgInfo().
@@ -437,7 +437,7 @@ const (
 // Raw strings are with a terminating NUL character.For convenience, use KernelArgInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelArgInfo.html
-func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelArgInfo(
 		kernel.handle(),
@@ -449,7 +449,7 @@ func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, par
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // KernelArgInfoString is a convenience method for KernelArgInfo() to query information values that are
@@ -458,7 +458,7 @@ func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, par
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func KernelArgInfoString(kernel Kernel, index uint32, paramName KernelArgInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return KernelArgInfo(kernel, index, paramName, paramSize, paramValue)
 	})
 }
@@ -541,8 +541,8 @@ const (
 // Since: 2.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelSubGroupInfo.html
 func KernelSubGroupInfo(kernel Kernel, device DeviceID, paramName KernelSubGroupInfoName,
-	inputSize uint, inputValue unsafe.Pointer,
-	paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	inputSize uintptr, inputValue unsafe.Pointer,
+	paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelSubGroupInfo(
 		kernel.handle(),
@@ -556,7 +556,7 @@ func KernelSubGroupInfo(kernel Kernel, device DeviceID, paramName KernelSubGroup
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // WorkDimension describes the parameters within one dimension of a work group.

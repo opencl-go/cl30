@@ -122,14 +122,14 @@ const (
 	// Note: The map count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for debugging.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	MemMapCountInfo MemObjectInfoName = C.CL_MEM_MAP_COUNT
 	// MemReferenceCountInfo returns the memory reference count.
 	//
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	MemReferenceCountInfo MemObjectInfoName = C.CL_MEM_REFERENCE_COUNT
 	// MemAssociatedMemObjectInfo returns the memory object from which the queried memory object is created.
 	//
@@ -194,7 +194,7 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetMemObjectInfo.html
-func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetMemObjectInfo(
 		mem.handle(),
@@ -205,7 +205,7 @@ func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uint, p
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // MapFlags describe how a memory object shall be mapped into host memory.

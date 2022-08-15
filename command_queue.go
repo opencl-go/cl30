@@ -39,7 +39,7 @@ const (
 	//
 	// Use WithQueueSize() for convenience.
 	//
-	// Property value type: Uint
+	// Property value type: uint32
 	// Since: 2.0
 	QueueSizeProperty uint64 = C.CL_QUEUE_SIZE
 )
@@ -73,7 +73,7 @@ type CommandQueueProperty []uint64
 
 // WithQueueSize is a convenience function to create a valid QueueSizeProperty.
 // Use it in combination with CreateCommandQueueWithProperties().
-func WithQueueSize(bytes Uint) CommandQueueProperty {
+func WithQueueSize(bytes uint32) CommandQueueProperty {
 	return CommandQueueProperty{QueueSizeProperty, uint64(bytes)}
 }
 
@@ -161,7 +161,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	QueueReferenceCountInfo CommandQueueInfoName = C.CL_QUEUE_REFERENCE_COUNT
 	// QueuePropertiesInfo returns the currently specified properties for the command-queue.
 	// These properties are specified by the value associated with the QueuePropertiesProperty passed in properties
@@ -177,7 +177,7 @@ const (
 	// QueueSizeInfo returns the size of the device command-queue. To be considered valid for this query,
 	// the command-queue must be a device command-queue.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	QueueSizeInfo CommandQueueInfoName = C.CL_QUEUE_SIZE
 	// QueueDeviceDefaultInfo returns the current default command-queue for the underlying device.
@@ -198,7 +198,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use CommandQueueInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetCommandQueueInfo.html
-func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetCommandQueueInfo(
 		commandQueue.handle(),
@@ -209,7 +209,7 @@ func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName,
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // Flush issues all previously queued OpenCL commands in a command-queue to the device associated with the

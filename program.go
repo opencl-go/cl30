@@ -438,7 +438,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use ProgramBuildInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetProgramBuildInfo.html
-func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetProgramBuildInfo(
 		program.handle(),
@@ -450,7 +450,7 @@ func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildIn
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // ProgramBuildInfoString is a convenience method for ProgramBuildInfo() to query information values that are
@@ -459,7 +459,7 @@ func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildIn
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func ProgramBuildInfoString(program Program, device DeviceID, paramName ProgramBuildInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return ProgramBuildInfo(program, device, paramName, paramSize, paramValue)
 	})
 }
@@ -473,7 +473,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	ProgramReferenceCountInfo ProgramInfoName = C.CL_PROGRAM_REFERENCE_COUNT
 	// ProgramContextInfo returns the context specified when the program object is created.
 	//
@@ -481,7 +481,7 @@ const (
 	ProgramContextInfo ProgramInfoName = C.CL_PROGRAM_CONTEXT
 	// ProgramNumDevicesInfo returns the number of devices associated with program.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	ProgramNumDevicesInfo ProgramInfoName = C.CL_PROGRAM_NUM_DEVICES
 	// ProgramDevicesInfo returns the list of devices associated with the program object. This can be the
 	// devices associated with context on which the program object has been created or can be a subset of devices
@@ -589,7 +589,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use ProgramInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetProgramInfo.html
-func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetProgramInfo(
 		program.handle(),
@@ -600,7 +600,7 @@ func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uint, par
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // ProgramInfoString is a convenience method for ProgramInfo() to query information values that are string-based.
@@ -608,7 +608,7 @@ func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uint, par
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func ProgramInfoString(program Program, paramName ProgramInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return ProgramInfo(program, paramName, paramSize, paramValue)
 	})
 }

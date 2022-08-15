@@ -257,12 +257,12 @@ const (
 	ImageBufferInfo ImageInfoName = C.CL_IMAGE_BUFFER
 	// ImageNumMipLevelsInfo returns the MIP level count associated with the image.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	ImageNumMipLevelsInfo ImageInfoName = C.CL_IMAGE_NUM_MIP_LEVELS
 	// ImageNumSamplesInfo returns the sample count associated with the image.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	ImageNumSamplesInfo ImageInfoName = C.CL_IMAGE_NUM_SAMPLES
 )
@@ -278,7 +278,7 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetImageInfo.html
-func ImageInfo(image MemObject, paramName ImageInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func ImageInfo(image MemObject, paramName ImageInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetImageInfo(
 		image.handle(),
@@ -289,7 +289,7 @@ func ImageInfo(image MemObject, paramName ImageInfoName, paramSize uint, paramVa
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // EnqueueReadImage enqueues a command to read from an image or image array object to host memory.

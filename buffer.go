@@ -9,7 +9,7 @@ import (
 // CreateBuffer creates a buffer object.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateBuffer.html
-func CreateBuffer(context Context, flags MemFlags, size uint, hostPtr unsafe.Pointer) (MemObject, error) {
+func CreateBuffer(context Context, flags MemFlags, size int, hostPtr unsafe.Pointer) (MemObject, error) {
 	var status C.cl_int
 	mem := C.clCreateBuffer(
 		context.handle(),
@@ -27,7 +27,7 @@ func CreateBuffer(context Context, flags MemFlags, size uint, hostPtr unsafe.Poi
 //
 // Since: 3.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateBufferWithProperties.html
-func CreateBufferWithProperties(context Context, flags MemFlags, size uint, hostPtr unsafe.Pointer, properties ...MemProperty) (MemObject, error) {
+func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostPtr unsafe.Pointer, properties ...MemProperty) (MemObject, error) {
 	var rawPropertyList []uint64
 	for _, property := range properties {
 		rawPropertyList = append(rawPropertyList, property...)
