@@ -13,8 +13,8 @@ Refer to [the documentation on opencl-go][opencl-go] on how to do this.
 The API requires knowledge of the [OpenCL API][opencl-api]. While the wrapper hides some low-level C-API details,
 there is still heavy use of `unsafe.Pointer` and the potential for memory access-violations if used wrong.
 
-[opencl-api]:[https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/]
-[opencl-go]:[https://opencl-go.github.com]
+[opencl-api]: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/
+[opencl-go]: https://opencl-go.github.com
 
 ## License
 
