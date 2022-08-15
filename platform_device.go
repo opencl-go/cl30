@@ -722,6 +722,12 @@ const (
 	// Returned type: CommandQueuePropertiesFlags
 	// Since: 2.0
 	DeviceQueueOnHostPropertiesInfo DeviceInfoName = C.CL_DEVICE_QUEUE_ON_HOST_PROPERTIES
+	// DeviceQueuePropertiesInfo describes the command-queue properties supported by the device. This is a bit-field
+	// that describes one or more of the following values: QueueOutOfOrderExecModeEnable, QueueProfilingEnable.
+	//
+	// Returned type: CommandQueuePropertiesFlags
+	// Deprecated: 1.2; Use DeviceQueueOnHostPropertiesInfo instead.
+	DeviceQueuePropertiesInfo DeviceInfoName = C.CL_DEVICE_QUEUE_PROPERTIES
 	// DeviceReferenceCountInfo returns the device reference count. If the device is a root-level device,
 	// a reference count of one is returned.
 	//
