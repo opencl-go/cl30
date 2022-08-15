@@ -170,6 +170,12 @@ const (
 	//
 	// Returned type: Ulong
 	DeviceGlobalMemCacheSizeInfo DeviceInfoName = C.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE
+	// DeviceHostUnifiedMemoryInfo is True if the device and the host have a unified memory subsystem and is
+	// False otherwise.
+	//
+	// Returned type: Bool
+	// Deprecated: 1.2
+	DeviceHostUnifiedMemoryInfo DeviceInfoName = C.CL_DEVICE_HOST_UNIFIED_MEMORY
 	// DeviceGlobalMemCacheTypeInfo represents the type of global memory cache supported.
 	//
 	// Returned type: DeviceMemCacheTypeEnum
