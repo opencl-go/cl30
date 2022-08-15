@@ -31,9 +31,6 @@ func (b Bool) ToGoBool() bool {
 // Uint represents an unsigned 32-bit integer in the OpenCL API.
 type Uint C.cl_uint
 
-// Ulong represents an unsigned 64-bit integer in the OpenCL API.
-type Ulong C.cl_ulong
-
 const (
 	// NameVersionByteSize is the size, in bytes, of the NameVersion structure.
 	NameVersionByteSize = unsafe.Sizeof(C.cl_name_version{})
