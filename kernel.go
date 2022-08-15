@@ -213,14 +213,14 @@ const (
 	KernelFunctionNameInfo KernelInfoName = C.CL_KERNEL_FUNCTION_NAME
 	// KernelNumArgsInfo returns the number of arguments to kernel.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	KernelNumArgsInfo KernelInfoName = C.CL_KERNEL_NUM_ARGS
 	// KernelReferenceCountInfo returns the kernel reference count.
 	//
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for general
 	// use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	KernelReferenceCountInfo KernelInfoName = C.CL_KERNEL_REFERENCE_COUNT
 	// KernelContextInfo returns the context associated with kernel.
 	//

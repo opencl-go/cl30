@@ -122,14 +122,14 @@ const (
 	// Note: The map count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for debugging.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	MemMapCountInfo MemObjectInfoName = C.CL_MEM_MAP_COUNT
 	// MemReferenceCountInfo returns the memory reference count.
 	//
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	MemReferenceCountInfo MemObjectInfoName = C.CL_MEM_REFERENCE_COUNT
 	// MemAssociatedMemObjectInfo returns the memory object from which the queried memory object is created.
 	//

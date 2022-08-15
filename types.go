@@ -28,9 +28,6 @@ func (b Bool) ToGoBool() bool {
 	return b != False
 }
 
-// Uint represents an unsigned 32-bit integer in the OpenCL API.
-type Uint C.cl_uint
-
 const (
 	// NameVersionByteSize is the size, in bytes, of the NameVersion structure.
 	NameVersionByteSize = unsafe.Sizeof(C.cl_name_version{})

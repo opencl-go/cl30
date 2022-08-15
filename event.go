@@ -91,7 +91,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	EventReferenceCountInfo EventInfoName = C.CL_EVENT_REFERENCE_COUNT
 	// EventCommandExecutionStatusInfo returns the execution status of the command identified by event.
 	//

@@ -473,7 +473,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	ProgramReferenceCountInfo ProgramInfoName = C.CL_PROGRAM_REFERENCE_COUNT
 	// ProgramContextInfo returns the context specified when the program object is created.
 	//
@@ -481,7 +481,7 @@ const (
 	ProgramContextInfo ProgramInfoName = C.CL_PROGRAM_CONTEXT
 	// ProgramNumDevicesInfo returns the number of devices associated with program.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	ProgramNumDevicesInfo ProgramInfoName = C.CL_PROGRAM_NUM_DEVICES
 	// ProgramDevicesInfo returns the list of devices associated with the program object. This can be the
 	// devices associated with context on which the program object has been created or can be a subset of devices

@@ -257,12 +257,12 @@ const (
 	ImageBufferInfo ImageInfoName = C.CL_IMAGE_BUFFER
 	// ImageNumMipLevelsInfo returns the MIP level count associated with the image.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	ImageNumMipLevelsInfo ImageInfoName = C.CL_IMAGE_NUM_MIP_LEVELS
 	// ImageNumSamplesInfo returns the sample count associated with the image.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	ImageNumSamplesInfo ImageInfoName = C.CL_IMAGE_NUM_SAMPLES
 )

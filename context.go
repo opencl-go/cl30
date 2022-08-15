@@ -94,7 +94,7 @@ func CreateContext(deviceIds []DeviceID, callback *ContextErrorCallback, propert
 	var status C.cl_int
 	context := C.cl30CreateContext(
 		(*C.cl_context_properties)(rawProperties),
-		C.uint(len(deviceIds)),
+		C.cl_uint(len(deviceIds)),
 		(*C.cl_device_id)(rawDeviceIds),
 		callbackKey,
 		&status)
@@ -257,7 +257,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for
 	// general use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	ContextReferenceCountInfo ContextInfoName = C.CL_CONTEXT_REFERENCE_COUNT
 	// ContextDevicesInfo returns the list of devices and sub-devices in context.
 	//
@@ -265,7 +265,7 @@ const (
 	ContextDevicesInfo ContextInfoName = C.CL_CONTEXT_DEVICES
 	// ContextNumDevicesInfo returns the number of devices in context.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	ContextNumDevicesInfo ContextInfoName = C.CL_CONTEXT_NUM_DEVICES
 	// ContextPropertiesInfo returns the properties argument specified in CreateContext() or CreateContextFromType().

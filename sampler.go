@@ -153,7 +153,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for general use
 	// in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	SamplerReferenceCountInfo SamplerInfoName = C.CL_SAMPLER_REFERENCE_COUNT
 	// SamplerContextInfo returns the context specified when the sampler is created.
 	//

@@ -76,7 +76,7 @@ const (
 	// DeviceAddressBitsInfo specify the default compute device address space size of the global address space specified
 	// as an unsigned integer value in bits. Currently supported values are 32 or 64 bits.
 	//
-	// Returned type: uint
+	// Returned type: uint32
 	DeviceAddressBitsInfo DeviceInfoName = C.CL_DEVICE_ADDRESS_BITS
 	// DeviceAtomicFenceCapabilitiesInfo describes the various memory orders and scopes that the device supports for
 	// atomic fence operations. This is a bit-field that has the same set of possible values as described for
@@ -182,7 +182,7 @@ const (
 	DeviceGlobalMemCacheTypeInfo DeviceInfoName = C.CL_DEVICE_GLOBAL_MEM_CACHE_TYPE
 	// DeviceGlobalMemCachelineSizeInfo is the size of global memory cache line in bytes.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceGlobalMemCachelineSizeInfo DeviceInfoName = C.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE
 	// DeviceGlobalMemSizeInfo is the size of global device memory in bytes.
 	//
@@ -249,7 +249,7 @@ const (
 	//
 	// This value must be 0 for devices that do not support 2D images created from a buffer.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceImageBaseAddressAlignmentInfo DeviceInfoName = C.CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT
 	// DeviceImageMaxArraySizeInfo is the maximum number of images in a 1D or 2D image array.
@@ -268,7 +268,7 @@ const (
 	// The value returned must be a power of 2.
 	// This value must be 0 for devices that do not support 2D images created from a buffer.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceImagePitchAlignmentInfo DeviceInfoName = C.CL_DEVICE_IMAGE_PITCH_ALIGNMENT
 	// DeviceImageSupportInfo is True if images are supported by the OpenCL device and False otherwise.
@@ -310,18 +310,18 @@ const (
 	//
 	// Note: This definition is missing before version 2.2.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Deprecated: by 2.2
 	DeviceMaxClockFrequencyInfo DeviceInfoName = C.CL_DEVICE_MAX_CLOCK_FREQUENCY
 	// DeviceMaxComputeUnitsInfo refers to the number of parallel compute units on the OpenCL device.
 	// A work-group executes on a single compute unit. The minimum value is 1.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMaxComputeUnitsInfo DeviceInfoName = C.CL_DEVICE_MAX_COMPUTE_UNITS
 	// DeviceMaxConstantArgsInfo is the maximum number of arguments declared with the __constant qualifier in a kernel.
 	// The minimum value is 8 for devices that are not of type DeviceTypeCustom.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMaxConstantArgsInfo DeviceInfoName = C.CL_DEVICE_MAX_CONSTANT_ARGS
 	// DeviceMaxConstantBufferSizeInfo is the maximum size in bytes of a constant buffer allocation. The minimum value
 	// is 64 KB for devices that are not of type DeviceTypeCustom.
@@ -348,7 +348,7 @@ const (
 	//
 	// The minimum value is 1 if the device supports subgroups, and must be 0 for devices that do not support subgroups.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.1
 	DeviceMaxNumSubGroupsInfo DeviceInfoName = C.CL_DEVICE_MAX_NUM_SUB_GROUPS
 	// DeviceMaxOnDeviceEventsInfo is the maximum number of events in use by a device queue. These refer to events
@@ -358,7 +358,7 @@ const (
 	// The minimum value is 1024 for devices supporting on-device queues, and must be 0 for devices that do not
 	// support on-device queues.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceMaxOnDeviceEventsInfo DeviceInfoName = C.CL_DEVICE_MAX_ON_DEVICE_EVENTS
 	// DeviceMaxOnDeviceQueuesInfo is the maximum number of device queues that can be created for this device in a
@@ -367,7 +367,7 @@ const (
 	// The minimum value is 1 for devices supporting on-device queues, and must be 0 for devices that do not
 	// support on-device queues.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceMaxOnDeviceQueuesInfo DeviceInfoName = C.CL_DEVICE_MAX_ON_DEVICE_QUEUES
 	// DeviceMaxParameterSizeInfo is the maximum size in bytes of all arguments that can be passed to a kernel.
@@ -380,13 +380,13 @@ const (
 	// DeviceMaxPipeArgsInfo is the maximum number of pipe objects that can be passed as arguments to a kernel.
 	// The minimum value is 16 for devices supporting pipes, and must be 0 for devices that do not support pipes.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceMaxPipeArgsInfo DeviceInfoName = C.CL_DEVICE_MAX_PIPE_ARGS
 	// DeviceMaxReadImageArgsInfo is the maximum number of image objects arguments of a kernel declared with the read_only
 	// qualifier. The minimum value is 128 if DeviceImageSupportInfo is True, the value is 0 otherwise.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMaxReadImageArgsInfo DeviceInfoName = C.CL_DEVICE_MAX_READ_IMAGE_ARGS
 	// DeviceMaxReadWriteImageArgsInfo is the maximum number of image objects arguments of a kernel declared with the
 	// write_only or read_write qualifier.
@@ -394,13 +394,13 @@ const (
 	// The minimum value is 64 if the device supports read-write images arguments, and must be 0 for devices that
 	// do not support read-write images.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceMaxReadWriteImageArgsInfo DeviceInfoName = C.CL_DEVICE_MAX_READ_WRITE_IMAGE_ARGS
 	// DeviceMaxSamplersInfo is the maximum number of samplers that can be used in a kernel.
 	// The minimum value is 16 if DeviceImageSupportInfo is True, the value is 0 otherwise.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMaxSamplersInfo DeviceInfoName = C.CL_DEVICE_MAX_SAMPLERS
 	// DeviceMaxWorkGroupSizeInfo is the maximum number of work-items in a work-group that a device is capable of
 	// executing on a single compute unit, for any given kernel-instance running on the device.
@@ -412,7 +412,7 @@ const (
 	// DeviceMaxWorkItemDimensionsInfo is the maximum dimensions that specify the global and local work-item IDs used by
 	// the data parallel execution model. The minimum value is 3 for devices that are not of type DeviceTypeCustom.
 	//
-	// Return type: Uint
+	// Return type: uint32
 	DeviceMaxWorkItemDimensionsInfo DeviceInfoName = C.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS
 	// DeviceMaxWorkItemSizesInfo is the maximum number of work-items that can be specified in each dimension of the
 	// work-group to EnqueueNDRangeKernel().
@@ -424,13 +424,13 @@ const (
 	// DeviceMaxWriteImageArgsInfo is the maximum number of image objects arguments of a kernel declared with the
 	// write_only qualifier. The minimum value is 64 if DeviceImageSupportInfo is True, the value is 0 otherwise.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMaxWriteImageArgsInfo DeviceInfoName = C.CL_DEVICE_MAX_WRITE_IMAGE_ARGS
 	// DeviceMemBaseAddrAlignInfo is the alignment requirement (in bits) for sub-buffer offsets. The minimum value is
 	// the size (in bits) of the largest OpenCL built-in data type supported by the device
 	// (long16 in FULL profile, long16 or int16 in EMBEDDED profile) for devices that are not of type DeviceTypeCustom.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceMemBaseAddrAlignInfo DeviceInfoName = C.CL_DEVICE_MEM_BASE_ADDR_ALIGN
 	// DeviceNameInfo refers to a human-readable string that identifies the device.
 	//
@@ -439,7 +439,7 @@ const (
 	// DeviceNativeVectorWidthCharInfo returns the native ISA vector width.
 	// The vector width is defined as the number of scalar elements that can be stored in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthCharInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR
 	// DeviceNativeVectorWidthDoubleInfo returns the native ISA vector width.
@@ -447,13 +447,13 @@ const (
 	//
 	// If double precision is not supported, this value must be 0.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthDoubleInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE
 	// DeviceNativeVectorWidthFloatInfo returns the native ISA vector width.
 	// The vector width is defined as the number of scalar elements that can be stored in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthFloatInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT
 	// DeviceNativeVectorWidthHalfInfo returns the native ISA vector width.
@@ -461,26 +461,26 @@ const (
 	//
 	// If the cl_khr_fp16 extension is not supported, this value must be 0.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	// Extension: cl_khr_fp16
 	DeviceNativeVectorWidthHalfInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF
 	// DeviceNativeVectorWidthIntInfo returns the native ISA vector width.
 	// The vector width is defined as the number of scalar elements that can be stored in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthIntInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT
 	// DeviceNativeVectorWidthLongInfo returns the native ISA vector width.
 	// The vector width is defined as the number of scalar elements that can be stored in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthLongInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG
 	// DeviceNativeVectorWidthShortInfo returns the native ISA vector width.
 	// The vector width is defined as the number of scalar elements that can be stored in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	DeviceNativeVectorWidthShortInfo DeviceInfoName = C.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT
 	// DeviceNonUniformWorkGroupSupportInfo is True if the device supports non-uniform work-groups, and False otherwise.
@@ -552,7 +552,7 @@ const (
 	// a device is partitioned.
 	// The value returned cannot exceed DeviceMaxComputeUnitsInfo.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	DevicePartitionMaxSubDevicesInfo DeviceInfoName = C.CL_DEVICE_PARTITION_MAX_SUB_DEVICES
 	// DevicePartitionPropertiesInfo returns the list of partition types supported by device.
@@ -586,14 +586,14 @@ const (
 	// work-item in a kernel. A work-group reservation is counted as one reservation per work-item.
 	// The minimum value is 1 for devices supporting pipes, and must be 0 for devices that do not support pipes.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DevicePipeMaxActiveReservationsInfo DeviceInfoName = C.CL_DEVICE_PIPE_MAX_ACTIVE_RESERVATIONS
 	// DevicePipeMaxPacketSizeInfo is the maximum size of pipe packet in bytes.
 	// The minimum value is 1024 bytes if the device supports pipes, and must be 0 for devices that do not
 	// support pipes.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DevicePipeMaxPacketSizeInfo DeviceInfoName = C.CL_DEVICE_PIPE_MAX_PACKET_SIZE
 	// DevicePipeSupportInfo is True if the device supports pipes, and False otherwise.
@@ -610,7 +610,7 @@ const (
 	// OpenCL 2.0 atomic types to global memory. This query can return 0 which indicates that the preferred
 	// alignment is aligned to the natural size of the type.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DevicePreferredGlobalAtomicAlignmentInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_GLOBAL_ATOMIC_ALIGNMENT
 	// DevicePreferredInteropUserSyncInfo is True if the devices preference is for the user to be responsible for
@@ -625,41 +625,41 @@ const (
 	// OpenCL 2.0 atomic types to local memory. This query can return 0 which indicates that the preferred
 	// alignment is aligned to the natural size of the type.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DevicePreferredLocalAtomicAlignmentInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_LOCAL_ATOMIC_ALIGNMENT
 	// DevicePreferredPlatformAtomicAlignmentInfo returns the value representing the preferred alignment in bytes for
 	// OpenCL 2.0 fine-grained SVM atomic types. This query can return 0 which indicates that the preferred
 	// alignment is aligned to the natural size of the type.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DevicePreferredPlatformAtomicAlignmentInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_PLATFORM_ATOMIC_ALIGNMENT
 	// DevicePreferredVectorWidthCharInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthCharInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR
 	// DevicePreferredVectorWidthDoubleInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	// If double precision is not supported, this value must be 0.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthDoubleInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE
 	// DevicePreferredVectorWidthFloatInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthFloatInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT
 	// DevicePreferredVectorWidthHalfInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	// If the cl_khr_fp16 extension is not supported, this value must be 0.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.1
 	// Extension: cl_khr_fp16
 	DevicePreferredVectorWidthHalfInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF
@@ -667,19 +667,19 @@ const (
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthIntInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT
 	// DevicePreferredVectorWidthLongInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthLongInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG
 	// DevicePreferredVectorWidthShortInfo is the preferred native vector width size for built-in scalar types that
 	// can be put into vectors. The vector width is defined as the number of scalar elements that can be stored
 	// in the vector.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DevicePreferredVectorWidthShortInfo DeviceInfoName = C.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT
 	// DevicePrintfBufferSizeInfo is the maximum size in bytes of the internal buffer that holds the output of printf
 	// calls from a kernel. The minimum value for the FULL profile is 1 MB.
@@ -705,7 +705,7 @@ const (
 	// The minimum value is 256 KB for the full profile and 64 KB for the embedded profile for devices supporting
 	// on-device queues, and must be 0 for devices that do not support on-device queues.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceQueueOnDeviceMaxSizeInfo DeviceInfoName = C.CL_DEVICE_QUEUE_ON_DEVICE_MAX_SIZE
 	// DeviceQueueOnDevicePreferredSizeInfo is the preferred size of the device queue, in bytes. Applications should
@@ -713,7 +713,7 @@ const (
 	// The minimum value is 16 KB for devices supporting on-device queues, and must be 0 for devices that
 	// do not support on-device queues.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 2.0
 	DeviceQueueOnDevicePreferredSizeInfo DeviceInfoName = C.CL_DEVICE_QUEUE_ON_DEVICE_PREFERRED_SIZE
 	// DeviceQueueOnDevicePropertiesInfo describes the on device command-queue properties supported by the device.
@@ -740,7 +740,7 @@ const (
 	// Note: The reference count returned should be considered immediately stale. It is unsuitable for general
 	// use in applications. This feature is provided for identifying memory leaks.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	// Since: 1.2
 	DeviceReferenceCountInfo DeviceInfoName = C.CL_DEVICE_REFERENCE_COUNT
 	// DeviceSingleFpConfigInfo describes single precision floating-point capability of the device. This is a bit-field.
@@ -772,7 +772,7 @@ const (
 	DeviceVendorInfo DeviceInfoName = C.CL_DEVICE_VENDOR
 	// DeviceVendorIDInfo is a unique device vendor identifier.
 	//
-	// Returned type: Uint
+	// Returned type: uint32
 	DeviceVendorIDInfo DeviceInfoName = C.CL_DEVICE_VENDOR_ID
 	// DeviceVersionInfo is an OpenCL version string. Returns the OpenCL version supported by the device.
 	// This version string has the following format:
@@ -1008,7 +1008,7 @@ const (
 	//
 	// Use PartitionedEqually() for convenience.
 	//
-	// Property value type: Uint
+	// Property value type: uint32
 	// Since: 1.2
 	DevicePartitionEquallyProperty uintptr = C.CL_DEVICE_PARTITION_EQUALLY
 	// DevicePartitionByCountsProperty is followed by a list of compute unit counts terminated with 0 or
@@ -1021,7 +1021,7 @@ const (
 	//
 	// Use PartitionedByCounts() for convenience.
 	//
-	// Property value type: Uint
+	// Property value type: uint32
 	// Since: 1.2
 	DevicePartitionByCountsProperty uintptr = C.CL_DEVICE_PARTITION_BY_COUNTS
 	// DevicePartitionByCountsListEndProperty terminates the property value list started by DevicePartitionByCountsProperty.
@@ -1045,13 +1045,13 @@ type DevicePartitionProperty []uintptr
 
 // PartitionedEqually is a convenience function to create a valid DevicePartitionEquallyProperty.
 // Use it in combination with CreateSubDevices().
-func PartitionedEqually(units uint) DevicePartitionProperty {
+func PartitionedEqually(units uint32) DevicePartitionProperty {
 	return DevicePartitionProperty{DevicePartitionEquallyProperty, uintptr(units)}
 }
 
 // PartitionedByCounts is a convenience function to create a valid DevicePartitionByCountsProperty.
 // Use it in combination with CreateSubDevices().
-func PartitionedByCounts(units []uint) DevicePartitionProperty {
+func PartitionedByCounts(units []uint32) DevicePartitionProperty {
 	values := make(DevicePartitionProperty, 0, len(units)+2)
 	values = append(values, DevicePartitionByCountsProperty)
 	for _, unit := range units {
