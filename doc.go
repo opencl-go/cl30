@@ -1,5 +1,14 @@
 // Package cl30 provides a wrapper API to OpenCL 3.0.
 //
+// If you require a different API level, refer to the opencl-go project (https://opencl-go.github.com) to see which
+// versions are available.
+//
+// To build and work with this library, you need an OpenCL SDK installed on your system.
+// Refer to the documentation on opencl-go (https://opencl-go.github.com) on how to do this.
+//
+// The API requires knowledge of the OpenCL API. While the wrapper hides some low-level C-API details,
+// there is still heavy use of `unsafe.Pointer` and the potential for memory access-violations if used wrong.
+//
 // This library wraps/represents constants, types, and functions as closely to the original API as possible -
 // while applying Go idioms.
 // It also provides convenience functions where practical. For example: PlatformInfoString().
