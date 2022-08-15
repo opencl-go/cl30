@@ -947,7 +947,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use DeviceInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetDeviceInfo.html
-func DeviceInfo(id DeviceID, paramName DeviceInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func DeviceInfo(id DeviceID, paramName DeviceInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetDeviceInfo(
 		id.handle(),
@@ -958,7 +958,7 @@ func DeviceInfo(id DeviceID, paramName DeviceInfoName, paramSize uint, paramValu
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // DeviceInfoString is a convenience method for DeviceInfo() to query information values that are string-based.
@@ -966,7 +966,7 @@ func DeviceInfo(id DeviceID, paramName DeviceInfoName, paramSize uint, paramValu
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func DeviceInfoString(id DeviceID, paramName DeviceInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return DeviceInfo(id, paramName, paramSize, paramValue)
 	})
 }

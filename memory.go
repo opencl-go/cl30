@@ -194,7 +194,7 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetMemObjectInfo.html
-func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetMemObjectInfo(
 		mem.handle(),
@@ -205,7 +205,7 @@ func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uint, p
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // MapFlags describe how a memory object shall be mapped into host memory.

@@ -113,7 +113,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use PlatformInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetPlatformInfo.html
-func PlatformInfo(id PlatformID, paramName PlatformInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func PlatformInfo(id PlatformID, paramName PlatformInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetPlatformInfo(
 		id.handle(),
@@ -124,7 +124,7 @@ func PlatformInfo(id PlatformID, paramName PlatformInfoName, paramSize uint, par
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // PlatformInfoString is a convenience method for PlatformInfo() to query information values that are string-based.
@@ -132,7 +132,7 @@ func PlatformInfo(id PlatformID, paramName PlatformInfoName, paramSize uint, par
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func PlatformInfoString(id PlatformID, paramName PlatformInfoName) (string, error) {
-	return queryString(func(paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 		return PlatformInfo(id, paramName, paramSize, paramValue)
 	})
 }

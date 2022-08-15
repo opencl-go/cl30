@@ -10,7 +10,7 @@ import (
 // The load function shall return the required number of bytes for the string, including the terminating NUL byte.
 // The load function is called twice, once with zero/nil to query the needed size, then a second time to retrieve
 // the value.
-func queryString(load func(paramSize uint, paramValue unsafe.Pointer) (uint, error)) (string, error) {
+func queryString(load func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error)) (string, error) {
 	requiredSize, err := load(0, nil)
 	if err != nil {
 		return "", err

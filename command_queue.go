@@ -198,7 +198,7 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use CommandQueueInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetCommandQueueInfo.html
-func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, paramSize uint, paramValue unsafe.Pointer) (uint, error) {
+func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetCommandQueueInfo(
 		commandQueue.handle(),
@@ -209,7 +209,7 @@ func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName,
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
-	return uint(sizeReturn), nil
+	return uintptr(sizeReturn), nil
 }
 
 // Flush issues all previously queued OpenCL commands in a command-queue to the device associated with the
