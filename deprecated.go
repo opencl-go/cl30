@@ -43,6 +43,30 @@ func CreateSampler(context Context, normalizedCoords bool, addressingMode Sample
 	return Sampler(*((*uintptr)(unsafe.Pointer(&sampler)))), nil
 }
 
+// EnqueueTask enqueues a command to execute a kernel, using a single work-item, on a device.
+//
+// EnqueueTask() is equivalent to calling EnqueueNDRangeKernel() with one WorkDimension that has
+// GlobalOffset = 0, GlobalSize = 1, and LocalSize = 1.
+//
+// Deprecated: 1.2; Use EnqueueNDRangeKernel() instead.
+// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueTask.html
+func EnqueueTask(commandQueue CommandQueue, kernel Kernel, waitList []Event, event *Event) error {
+	var rawWaitList unsafe.Pointer
+	if len(waitList) > 0 {
+		rawWaitList = unsafe.Pointer(&waitList[0])
+	}
+	status := C.clEnqueueTask(
+		commandQueue.handle(),
+		kernel.handle(),
+		C.cl_uint(len(waitList)),
+		(*C.cl_event)(rawWaitList),
+		(*C.cl_event)(unsafe.Pointer(event)))
+	if status != C.CL_SUCCESS {
+		return StatusError(status)
+	}
+	return nil
+}
+
 // SetProgramReleaseCallback registers a destructor callback function with a program object.
 //
 // Each call to SetProgramReleaseCallback() registers the specified callback function on a callback stack associated
