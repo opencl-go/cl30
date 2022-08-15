@@ -102,6 +102,7 @@ func CreateKernelsInProgram(program Program) ([]Kernel, error) {
 // For example, if a buffer or pointer argument is set on a kernel object, the pointer is copied but the underlying
 // memory allocation is not.
 //
+// Since: 2.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCloneKernel.html
 func CloneKernel(kernel Kernel) (Kernel, error) {
 	var status C.cl_int
