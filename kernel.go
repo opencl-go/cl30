@@ -1,6 +1,11 @@
 package cl30
 
 // #include "api.h"
+// extern cl_int cl30EnqueueNativeKernel(cl_command_queue commandQueue,
+//    void *args, size_t argsSize,
+//    cl_uint numMemObjects, cl_mem *memList, void const *argsMemLoc,
+//    cl_uint waitListCount, cl_event const *waitList,
+//    cl_event *event);
 import "C"
 import (
 	"fmt"
@@ -590,4 +595,67 @@ func EnqueueNDRangeKernel(commandQueue CommandQueue, kernel Kernel, workDimensio
 		return StatusError(status)
 	}
 	return nil
+}
+
+// EnqueueNativeKernel enqueues a command to execute a native Go function not compiled using the OpenCL compiler.
+//
+// The provided callback function will receive pointers to global memory that represents the provided MemObject
+// entries.
+//
+// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueNativeKernel.html
+func EnqueueNativeKernel(commandQueue CommandQueue, callback func([]unsafe.Pointer), memObjects []MemObject, waitList []Event, event *Event) error {
+	callbackUserData, err := userDataFor(func(argBasePtr unsafe.Pointer) {
+		argMovePtr := argBasePtr
+		memPtr := make([]unsafe.Pointer, len(memObjects))
+		for i := 0; i < len(memObjects); i++ {
+			memPtr[i] = unsafe.Pointer(*(**uintptr)(argMovePtr))
+			argMovePtr = unsafe.Add(argMovePtr, unsafe.Sizeof(uintptr(0)))
+		}
+		callback(memPtr)
+	})
+	if err != nil {
+		return err
+	}
+	var rawWaitList unsafe.Pointer
+	if len(waitList) > 0 {
+		rawWaitList = unsafe.Pointer(&waitList[0])
+	}
+	rawArgs := make([]uintptr, len(memObjects)+1)
+	rawArgs[0] = uintptr(unsafe.Pointer(callbackUserData.ptr))
+	var rawArgsMemLocs []uintptr
+	var rawArgsPtr unsafe.Pointer
+	var rawMemObjectsPtr unsafe.Pointer
+	var rawArgsMemLocsPtr unsafe.Pointer
+	if len(memObjects) > 0 {
+		rawMemObjectsPtr = unsafe.Pointer(&memObjects[0])
+		rawArgsMemLocs = make([]uintptr, len(memObjects))
+		for i := 0; i < len(memObjects); i++ {
+			rawArgsMemLocs[i] = uintptr(unsafe.Pointer(&rawArgs[1+i]))
+		}
+		rawArgsMemLocsPtr = unsafe.Pointer(&rawArgsMemLocs[0])
+	}
+	rawArgsPtr = unsafe.Pointer(&rawArgs[0])
+	status := C.cl30EnqueueNativeKernel(
+		commandQueue.handle(),
+		rawArgsPtr,
+		C.size_t(uintptr(len(rawArgs))*unsafe.Sizeof(uintptr(0))),
+		C.cl_uint(len(memObjects)),
+		(*C.cl_mem)(rawMemObjectsPtr),
+		rawArgsMemLocsPtr,
+		C.cl_uint(len(waitList)),
+		(*C.cl_event)(rawWaitList),
+		(*C.cl_event)(unsafe.Pointer(event)))
+	if status != C.CL_SUCCESS {
+		callbackUserData.Delete()
+		return StatusError(status)
+	}
+	return nil
+}
+
+//export cl30GoKernelNativeCallback
+func cl30GoKernelNativeCallback(args unsafe.Pointer) {
+	callbackUserData := userDataFrom(*(**C.uintptr_t)(args))
+	callback := callbackUserData.Value().(func(unsafe.Pointer))
+	callbackUserData.Delete()
+	callback(unsafe.Add(args, unsafe.Sizeof(uintptr(0))))
 }
