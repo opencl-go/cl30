@@ -1,5 +1,11 @@
 # Go wrapper library for OpenCL 3.0 
 
+[![Go version of Go module](https://img.shields.io/github/go-mod/go-version/opencl-go/cl30.svg)](https://github.com/opencl-go/cl30)
+[![GoDoc reference](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/opencl-go/cl30)
+[![GoReportCard](https://goreportcard.com/badge/github.com/opencl-go/cl30)](https://goreportcard.com/report/github.com/opencl-go/cl30)
+[![License](https://img.shields.io/github/license/opencl-go/cl30.svg)](https://github.com/opencl-go/cl30/blob/main/LICENSE)
+[![OpenCL 3.0](https://img.shields.io/badge/OpenCL-3.0-green.svg)][opencl-api]
+
 This library provides a complete wrapper for the OpenCL 3.0 API.
 If you require a different API level, refer to [the opencl-go project][opencl-go] to see which versions are available.
 
