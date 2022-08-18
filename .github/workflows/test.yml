@@ -18,22 +18,27 @@ jobs:
           go-version: 1.18
       - uses: actions/checkout@v3
       - name: Install libraries
+        env:
+          OPENCL_RUNTIME_VER: 2022.14.8.0.04
+          INTEL_TBB_VER: 2021.5.0
         run: |
           sudo apt-get update
           sudo apt-get install -y opencl-headers ocl-icd-opencl-dev
-          wget --quiet https://github.com/intel/llvm/releases/download/2022-WW33/oclcpuexp-2022.14.8.0.04_rel.tar.gz --output-document=/tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz
-          wget --quiet https://github.com/oneapi-src/oneTBB/releases/download/v2021.5.0/oneapi-tbb-2021.5.0-lin.tgz --output-document=/tmp/oneapi-tbb-2021.5.0-lin.tgz
-          sudo mkdir --parents /opt/intel/oclcpuexp_2022.14.8.0.04
-          sudo tar -zxvf /tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz -C /opt/intel/oclcpuexp_2022.14.8.0.04
-          sudo tar -zxvf /tmp/oneapi-tbb-2021.5.0-lin.tgz -C /opt/intel
+          # The following is the installation procedure of the Intel OpenCL CPU runtime as per
+          # https://github.com/intel/llvm/blob/sycl/sycl/doc/GetStartedGuide.md#install-low-level-runtime
+          wget --quiet https://github.com/intel/llvm/releases/download/2022-WW33/oclcpuexp-${OPENCL_RUNTIME_VER}_rel.tar.gz --output-document=/tmp/oclcpuexp-${OPENCL_RUNTIME_VER}_rel.tar.gz
+          wget --quiet https://github.com/oneapi-src/oneTBB/releases/download/v${INTEL_TBB_VER}/oneapi-tbb-${INTEL_TBB_VER}-lin.tgz --output-document=/tmp/oneapi-tbb-${INTEL_TBB_VER}-lin.tgz
+          sudo mkdir --parents /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}
+          sudo tar -zxvf /tmp/oclcpuexp-${OPENCL_RUNTIME_VER}_rel.tar.gz -C /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}
+          sudo tar -zxvf /tmp/oneapi-tbb-${INTEL_TBB_VER}-lin.tgz -C /opt/intel
           sudo mkdir --parents /etc/OpenCL/vendors
-          echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so | sudo tee -a /etc/OpenCL/vendors/intel_expcpu.icd
-          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
-          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
-          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so.12 /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
-          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so.2 /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
-          echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/ | sudo tee -a /etc/ld.so.conf.d/libintelopenclexp.conf
+          echo /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/libintelocl.so | sudo tee -a /etc/OpenCL/vendors/intel_expcpu.icd
+          sudo ln -s /opt/intel/oneapi-tbb-${INTEL_TBB_VER}/lib/intel64/gcc4.8/libtbb.so /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-${INTEL_TBB_VER}/lib/intel64/gcc4.8/libtbbmalloc.so /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-${INTEL_TBB_VER}/lib/intel64/gcc4.8/libtbb.so.12 /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-${INTEL_TBB_VER}/lib/intel64/gcc4.8/libtbbmalloc.so.2 /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/
+          echo /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/ | sudo tee -a /etc/ld.so.conf.d/libintelopenclexp.conf
           sudo ldconfig -f /etc/ld.so.conf.d/libintelopenclexp.conf
-          ldd /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so
+          ldd /opt/intel/oclcpuexp_${OPENCL_RUNTIME_VER}/x64/libintelocl.so
       - name: Run tests
         run: go test -race -test.v=true ./...
