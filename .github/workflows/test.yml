@@ -21,5 +21,18 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y opencl-headers ocl-icd-opencl-dev
+          wget --quiet https://github.com/intel/llvm/releases/download/2022-WW33/oclcpuexp-2022.14.8.0.04_rel.tar.gz --output-document=/tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz
+          wget --quiet https://github.com/oneapi-src/oneTBB/releases/download/v2021.5.0/oneapi-tbb-2021.5.0-lin.tgz --output-document=/tmp/oneapi-tbb-2021.5.0-lin.tgz
+          sudo mkdir --parents /opt/intel/oclcpuexp_2022.14.8.0.04
+          sudo tar -zxvf /tmp/intel-llvm/oclcpuexp-2022.14.8.0.04_rel.tar.gz -C /opt/intel/oclcpuexp_2022.14.8.0.04
+          sudo tar -zxvf /tmp/oneapi-tbb-2021.5.0-lin.tgz -C /opt/intel
+          echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so | sudo tee -a /etc/OpenCL/vendors/intel_expcpu.icd
+          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so.12 /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
+          sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so.2 /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
+          echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/ | sudo tee -a /etc/ld.so.conf.d/libintelopenclexp.conf
+          sudo ldconfig -f /etc/ld.so.conf.d/libintelopenclexp.conf
+          ldd /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so
       - name: Run tests
-        run: go test -race ./...
+        run: go test -race -test.v=true ./...
