@@ -26,6 +26,7 @@ jobs:
           sudo mkdir --parents /opt/intel/oclcpuexp_2022.14.8.0.04
           sudo tar -zxvf /tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz -C /opt/intel/oclcpuexp_2022.14.8.0.04
           sudo tar -zxvf /tmp/oneapi-tbb-2021.5.0-lin.tgz -C /opt/intel
+          sudo mkdir --parents /etc/OpenCL/vendors
           echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so | sudo tee -a /etc/OpenCL/vendors/intel_expcpu.icd
           sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
           sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbbmalloc.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
