@@ -24,7 +24,7 @@ jobs:
           wget --quiet https://github.com/intel/llvm/releases/download/2022-WW33/oclcpuexp-2022.14.8.0.04_rel.tar.gz --output-document=/tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz
           wget --quiet https://github.com/oneapi-src/oneTBB/releases/download/v2021.5.0/oneapi-tbb-2021.5.0-lin.tgz --output-document=/tmp/oneapi-tbb-2021.5.0-lin.tgz
           sudo mkdir --parents /opt/intel/oclcpuexp_2022.14.8.0.04
-          sudo tar -zxvf /tmp/intel-llvm/oclcpuexp-2022.14.8.0.04_rel.tar.gz -C /opt/intel/oclcpuexp_2022.14.8.0.04
+          sudo tar -zxvf /tmp/oclcpuexp-2022.14.8.0.04_rel.tar.gz -C /opt/intel/oclcpuexp_2022.14.8.0.04
           sudo tar -zxvf /tmp/oneapi-tbb-2021.5.0-lin.tgz -C /opt/intel
           echo /opt/intel/oclcpuexp_2022.14.8.0.04/x64/libintelocl.so | sudo tee -a /etc/OpenCL/vendors/intel_expcpu.icd
           sudo ln -s /opt/intel/oneapi-tbb-2021.5.0/lib/intel64/gcc4.8/libtbb.so /opt/intel/oclcpuexp_2022.14.8.0.04/x64/
