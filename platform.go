@@ -28,20 +28,25 @@ func (id PlatformID) String() string {
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetPlatformIDs.html
 func PlatformIDs() ([]PlatformID, error) {
-	count := C.cl_uint(0)
-	status := C.clGetPlatformIDs(0, nil, &count)
+	requiredCount := C.cl_uint(0)
+	status := C.clGetPlatformIDs(0, nil, &requiredCount)
 	if status != C.CL_SUCCESS {
 		return nil, StatusError(status)
 	}
-	if count == 0 {
+	if requiredCount == 0 {
 		return nil, nil
 	}
-	ids := make([]PlatformID, count)
-	status = C.clGetPlatformIDs(count, (*C.cl_platform_id)(unsafe.Pointer(&ids[0])), &count)
+	ids := make([]PlatformID, requiredCount)
+	returnedCount := C.cl_uint(0)
+	status = C.clGetPlatformIDs(requiredCount, (*C.cl_platform_id)(unsafe.Pointer(&ids[0])), &returnedCount)
 	if status != C.CL_SUCCESS {
 		return nil, StatusError(status)
 	}
-	return ids[:count], nil
+	usedCount := returnedCount
+	if usedCount > requiredCount {
+		usedCount = requiredCount
+	}
+	return ids[:usedCount], nil
 }
 
 // PlatformInfoName identifies properties of a platform, which can be queried with PlatformInfo().
