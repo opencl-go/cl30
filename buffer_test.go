@@ -9,7 +9,7 @@ import (
 
 func TestBufferRegionSize(t *testing.T) {
 	t.Parallel()
-	if (cl.BufferRegionByteSize != unsafe.Sizeof(cl.BufferRegion{})) {
+	if cl.BufferRegionByteSize != unsafe.Sizeof(cl.BufferRegion{}) {
 		t.Errorf("byte size mismatch")
 	}
 }

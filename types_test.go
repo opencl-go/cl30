@@ -9,7 +9,7 @@ import (
 
 func TestNameVersion(t *testing.T) {
 	t.Parallel()
-	if (cl.NameVersionByteSize != unsafe.Sizeof(cl.NameVersion{})) {
+	if cl.NameVersionByteSize != unsafe.Sizeof(cl.NameVersion{}) {
 		t.Errorf("byte size mismatch")
 	}
 }
