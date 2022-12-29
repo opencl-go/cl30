@@ -3,6 +3,7 @@ package cl30
 // #include "api.h"
 import "C"
 import (
+	"runtime"
 	"unsafe"
 )
 
@@ -54,6 +55,14 @@ func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostP
 // BufferCreateType determines the kind of sub-buffer object.
 type BufferCreateType C.cl_buffer_create_type
 
+// BufferCreateInfo provides access information on how a buffer shall be created.
+type BufferCreateInfo interface {
+	// Type returns the type of the information.
+	Type() BufferCreateType
+	// Pointer returns the raw pointer to the first address of the information.
+	Pointer() unsafe.Pointer
+}
+
 const (
 	// BufferCreateTypeRegion describes a buffer object that represents a specific region in buffer.
 	//
@@ -73,20 +82,32 @@ type BufferRegion struct {
 	Size   uintptr
 }
 
+// Type returns BufferCreateTypeRegion.
+func (info *BufferRegion) Type() BufferCreateType {
+	return BufferCreateTypeRegion
+}
+
+// Pointer returns the raw pointer of info.
+func (info *BufferRegion) Pointer() unsafe.Pointer {
+	return unsafe.Pointer(info)
+}
+
 // CreateSubBuffer creates a new buffer object (referred to as a sub-buffer object) from an existing buffer object.
 //
-// The createInfo parameter is dependent on the specified createType.
+// The memory region addressed by the pointer of createInfo is dependent on the type of createInfo.
 //
 // Since: 1.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateSubBuffer.html
-func CreateSubBuffer(buffer MemObject, flags MemFlags, createType BufferCreateType, createInfo unsafe.Pointer) (MemObject, error) {
+func CreateSubBuffer(buffer MemObject, flags MemFlags, createInfo BufferCreateInfo) (MemObject, error) {
 	var status C.cl_int
+	createInfoPtr := ResolvePointer(createInfo, false, "createInfo")
 	mem := C.clCreateSubBuffer(
 		buffer.handle(),
 		C.cl_mem_flags(flags),
-		C.cl_buffer_create_type(createType),
-		createInfo,
+		C.cl_buffer_create_type(createInfo.Type()),
+		createInfoPtr,
 		&status)
+	runtime.KeepAlive(createInfoPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
