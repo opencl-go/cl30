@@ -4,6 +4,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -195,17 +196,17 @@ const (
 // Call the function with a zero size and nil value to request the required size. This helps in determining
 // the necessary space for dynamic information, such as arrays.
 //
-// Raw strings are with a terminating NUL character. For convenience, use CommandQueueInfoString().
-//
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetCommandQueueInfo.html
-func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func CommandQueueInfo(commandQueue CommandQueue, paramName CommandQueueInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetCommandQueueInfo(
 		commandQueue.handle(),
 		C.cl_command_queue_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
