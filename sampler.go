@@ -4,6 +4,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -189,14 +190,16 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetSamplerInfo.html
-func SamplerInfo(sampler Sampler, paramName ContextInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func SamplerInfo(sampler Sampler, paramName ContextInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetSamplerInfo(
 		sampler.handle(),
 		C.cl_sampler_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}

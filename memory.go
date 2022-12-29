@@ -5,6 +5,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -194,14 +195,16 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetMemObjectInfo.html
-func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func MemObjectInfo(mem MemObject, paramName MemObjectInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetMemObjectInfo(
 		mem.handle(),
 		C.cl_mem_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(param)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -232,18 +235,20 @@ const (
 // Reads or writes from the host using the pointer returned by the mapping functions are considered to be complete.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueUnmapMemObject.html
-func EnqueueUnmapMemObject(commandQueue CommandQueue, mem MemObject, mappedPtr unsafe.Pointer, waitList []Event, event *Event) error {
+func EnqueueUnmapMemObject(commandQueue CommandQueue, mem MemObject, mappedPtr HostPointer, waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawMappedPtr := ResolvePointer(mappedPtr, false, "mappedPtr")
 	status := C.clEnqueueUnmapMemObject(
 		commandQueue.handle(),
 		mem.handle(),
-		mappedPtr,
+		rawMappedPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(rawMappedPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}

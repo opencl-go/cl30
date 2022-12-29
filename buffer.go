@@ -12,12 +12,14 @@ import (
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateBuffer.html
 func CreateBuffer(context Context, flags MemFlags, size int, hostPtr HostPointer) (MemObject, error) {
 	var status C.cl_int
+	rawHostPtr := ResolvePointer(hostPtr, false, "hostPtr")
 	mem := C.clCreateBuffer(
 		context.handle(),
 		C.cl_mem_flags(flags),
 		C.size_t(size),
-		ResolvePointer(hostPtr, false, "hostPtr"),
+		rawHostPtr,
 		&status)
+	runtime.KeepAlive(rawHostPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -39,13 +41,15 @@ func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostP
 		rawProperties = unsafe.Pointer(&rawPropertyList[0])
 	}
 	var status C.cl_int
+	rawHostPtr := ResolvePointer(hostPtr, false, "hostPtr")
 	mem := C.clCreateBufferWithProperties(
 		context.handle(),
 		(*C.cl_mem_properties)(rawProperties),
 		C.cl_mem_flags(flags),
 		C.size_t(size),
-		ResolvePointer(hostPtr, false, "hostPtr"),
+		rawHostPtr,
 		&status)
+	runtime.KeepAlive(rawHostPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -174,16 +178,18 @@ func EnqueueReadBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bo
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	dataPtr := ResolvePointer(data, !blockingRead, "data")
 	status := C.clEnqueueReadBuffer(
 		commandQueue.handle(),
 		mem.handle(),
 		C.cl_bool(BoolFrom(blockingRead)),
 		C.size_t(offset),
 		sizeOf(data),
-		ResolvePointer(data, !blockingRead, "data"),
+		dataPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(dataPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -201,6 +207,7 @@ func EnqueueReadBufferRect(commandQueue CommandQueue, mem MemObject, blockingRea
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	dataPtr := ResolvePointer(data, !blockingRead, "data")
 	status := C.clEnqueueReadBufferRect(
 		commandQueue.handle(),
 		mem.handle(),
@@ -212,10 +219,11 @@ func EnqueueReadBufferRect(commandQueue CommandQueue, mem MemObject, blockingRea
 		C.size_t(bufferSlicePitch),
 		C.size_t(hostRowPitch),
 		C.size_t(hostSlicePitch),
-		ResolvePointer(data, !blockingRead, "data"),
+		dataPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(dataPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -231,16 +239,18 @@ func EnqueueWriteBuffer(commandQueue CommandQueue, mem MemObject, blockingWrite 
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	dataPtr := ResolvePointer(data, !blockingWrite, "data")
 	status := C.clEnqueueWriteBuffer(
 		commandQueue.handle(),
 		mem.handle(),
 		C.cl_bool(BoolFrom(blockingWrite)),
 		C.size_t(offset),
 		sizeOf(data),
-		ResolvePointer(data, !blockingWrite, "data"),
+		dataPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(dataPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -258,6 +268,7 @@ func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingWr
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	dataPtr := ResolvePointer(data, !blockingWrite, "data")
 	status := C.clEnqueueWriteBufferRect(
 		commandQueue.handle(),
 		mem.handle(),
@@ -269,10 +280,11 @@ func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingWr
 		C.size_t(bufferSlicePitch),
 		C.size_t(hostRowPitch),
 		C.size_t(hostSlicePitch),
-		ResolvePointer(data, !blockingWrite, "data"),
+		dataPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(dataPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -289,16 +301,18 @@ func EnqueueFillBuffer(commandQueue CommandQueue, mem MemObject, pattern HostMem
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	patternPtr := ResolvePointer(pattern, false, "pattern")
 	status := C.clEnqueueFillBuffer(
 		commandQueue.handle(),
 		mem.handle(),
-		ResolvePointer(pattern, false, "pattern"),
+		patternPtr,
 		sizeOf(pattern),
 		C.size_t(offset),
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(patternPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}

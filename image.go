@@ -2,7 +2,10 @@ package cl30
 
 // #include "api.h"
 import "C"
-import "unsafe"
+import (
+	"runtime"
+	"unsafe"
+)
 
 // ChannelOrder describes the sequence and nature of the color channels of an image.
 type ChannelOrder C.cl_channel_order
@@ -90,15 +93,17 @@ type ImageDesc struct {
 //
 // Since: 1.2
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateImage.html
-func CreateImage(context Context, flags MemFlags, format ImageFormat, desc ImageDesc, hostPtr unsafe.Pointer) (MemObject, error) {
+func CreateImage(context Context, flags MemFlags, format ImageFormat, desc ImageDesc, hostPtr HostPointer) (MemObject, error) {
 	var status C.cl_int
+	rawHostPtr := ResolvePointer(hostPtr, false, "hostPtr")
 	mem := C.clCreateImage(
 		context.handle(),
 		C.cl_mem_flags(flags),
 		(*C.cl_image_format)(unsafe.Pointer(&format)),
 		(*C.cl_image_desc)(unsafe.Pointer(&desc)),
-		hostPtr,
+		rawHostPtr,
 		&status)
+	runtime.KeepAlive(rawHostPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -110,7 +115,7 @@ func CreateImage(context Context, flags MemFlags, format ImageFormat, desc Image
 //
 // Since: 3.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateImageWithProperties.html
-func CreateImageWithProperties(context Context, flags MemFlags, format ImageFormat, desc ImageDesc, hostPtr unsafe.Pointer,
+func CreateImageWithProperties(context Context, flags MemFlags, format ImageFormat, desc ImageDesc, hostPtr HostPointer,
 	properties ...MemProperty) (MemObject, error) {
 	var rawPropertyList []uint64
 	for _, property := range properties {
@@ -122,14 +127,16 @@ func CreateImageWithProperties(context Context, flags MemFlags, format ImageForm
 		rawProperties = unsafe.Pointer(&rawPropertyList[0])
 	}
 	var status C.cl_int
+	rawHostPtr := ResolvePointer(hostPtr, false, "hostPtr")
 	mem := C.clCreateImageWithProperties(
 		context.handle(),
 		(*C.cl_mem_properties)(rawProperties),
 		C.cl_mem_flags(flags),
 		(*C.cl_image_format)(unsafe.Pointer(&format)),
 		(*C.cl_image_desc)(unsafe.Pointer(&desc)),
-		hostPtr,
+		rawHostPtr,
 		&status)
+	runtime.KeepAlive(rawHostPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -286,14 +293,16 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetImageInfo.html
-func ImageInfo(image MemObject, paramName ImageInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func ImageInfo(image MemObject, paramName ImageInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetImageInfo(
 		image.handle(),
 		C.cl_image_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -310,6 +319,7 @@ func EnqueueReadImage(commandQueue CommandQueue, image MemObject, blocking bool,
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawPtr := ResolvePointer(ptr, !blocking, "ptr")
 	status := C.clEnqueueReadImage(
 		commandQueue.handle(),
 		image.handle(),
@@ -318,10 +328,11 @@ func EnqueueReadImage(commandQueue CommandQueue, image MemObject, blocking bool,
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.size_t(rowPitch),
 		C.size_t(slicePitch),
-		ResolvePointer(ptr, !blocking, "ptr"),
+		rawPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(rawPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -338,6 +349,7 @@ func EnqueueWriteImage(commandQueue CommandQueue, image MemObject, blocking bool
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawPtr := ResolvePointer(ptr, !blocking, "ptr")
 	status := C.clEnqueueWriteImage(
 		commandQueue.handle(),
 		image.handle(),
@@ -346,10 +358,11 @@ func EnqueueWriteImage(commandQueue CommandQueue, image MemObject, blocking bool
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.size_t(rowPitch),
 		C.size_t(slicePitch),
-		ResolvePointer(ptr, !blocking, "ptr"),
+		rawPtr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(rawPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -372,15 +385,17 @@ func EnqueueFillImage(commandQueue CommandQueue, image MemObject, fillColor Host
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	fillColorPtr := ResolvePointer(fillColor, false, "fillColor")
 	status := C.clEnqueueFillImage(
 		commandQueue.handle(),
 		image.handle(),
-		ResolvePointer(fillColor, false, "fillColor"),
+		fillColorPtr,
 		(*C.size_t)(unsafe.Pointer(&origin[0])),
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(fillColorPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}

@@ -15,6 +15,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -95,9 +96,11 @@ func EnqueueSvmFree(commandQueue CommandQueue, ptrs []HostPointer, callback func
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawPointers := make([]unsafe.Pointer, len(ptrs))
 	ptrAddresses := make([]uintptr, len(ptrs))
 	for i, ptr := range ptrs {
-		ptrAddresses[i] = uintptr(ResolvePointer(ptr, true, fmt.Sprintf("ptrs[%d]", i)))
+		rawPointers[i] = ResolvePointer(ptr, true, fmt.Sprintf("ptrs[%d]", i))
+		ptrAddresses[i] = uintptr(rawPointers[i])
 	}
 	status := C.cl30EnqueueSVMFree(
 		commandQueue.handle(),
@@ -107,6 +110,9 @@ func EnqueueSvmFree(commandQueue CommandQueue, ptrs []HostPointer, callback func
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	for _, rawPtr := range rawPointers {
+		runtime.KeepAlive(rawPtr)
+	}
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -132,15 +138,19 @@ func EnqueueSvmMemcpy(commandQueue CommandQueue, blocking bool, dstPtr, srcPtr H
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawDstPtr := ResolvePointer(dstPtr, !blocking, "dstPtr")
+	rawSrcPtr := ResolvePointer(srcPtr, !blocking, "srcPtr")
 	status := C.clEnqueueSVMMemcpy(
 		commandQueue.handle(),
 		C.cl_bool(BoolFrom(blocking)),
-		ResolvePointer(dstPtr, !blocking, "dstPtr"),
-		ResolvePointer(srcPtr, !blocking, "srcPtr"),
+		rawDstPtr,
+		rawSrcPtr,
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(rawDstPtr)
+	runtime.KeepAlive(rawSrcPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
@@ -159,15 +169,19 @@ func EnqueueSvmMemFill(commandQueue CommandQueue, svmPtr, pattern HostPointer, p
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
+	rawSvmPtr := ResolvePointer(svmPtr, true, "svmPtr")
+	patternPtr := ResolvePointer(pattern, true, "pattern")
 	status := C.clEnqueueSVMMemFill(
 		commandQueue.handle(),
-		ResolvePointer(svmPtr, true, "svmPtr"),
-		ResolvePointer(pattern, true, "pattern"),
+		rawSvmPtr,
+		patternPtr,
 		C.size_t(patternSize),
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
+	runtime.KeepAlive(rawSvmPtr)
+	runtime.KeepAlive(patternPtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}

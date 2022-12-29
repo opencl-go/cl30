@@ -2,7 +2,10 @@ package cl30
 
 // #include "api.h"
 import "C"
-import "unsafe"
+import (
+	"runtime"
+	"unsafe"
+)
 
 // PipeProperty is one entry of properties which are taken into account when creating pipes.
 type PipeProperty []uintptr
@@ -71,14 +74,16 @@ const (
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetPipeInfo.html
-func PipeInfo(pipe MemObject, paramName PipeInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func PipeInfo(pipe MemObject, paramName PipeInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetPipeInfo(
 		pipe.handle(),
 		C.cl_pipe_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}

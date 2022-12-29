@@ -4,6 +4,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -949,12 +950,14 @@ const (
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetDeviceInfo.html
 func DeviceInfo(id DeviceID, paramName DeviceInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetDeviceInfo(
 		id.handle(),
 		C.cl_device_info(paramName),
 		sizeOf(param),
-		ResolvePointer(param, false, "param"),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}

@@ -18,6 +18,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -223,12 +224,14 @@ func cl30GoProgramBuildCallback(_ Program, userData *C.uintptr_t) {
 //
 // Since: 2.2
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clSetProgramSpecializationConstant.html
-func SetProgramSpecializationConstant(program Program, id uint32, size uintptr, value unsafe.Pointer) error {
+func SetProgramSpecializationConstant(program Program, id uint32, value HostMemory) error {
+	valuePtr := ResolvePointer(value, false, "")
 	status := C.clSetProgramSpecializationConstant(
 		program.handle(),
 		C.cl_uint(id),
-		C.size_t(size),
-		value)
+		sizeOf(value),
+		valuePtr)
+	runtime.KeepAlive(valuePtr)
 	if status != C.CL_SUCCESS {
 		return StatusError(status)
 	}
