@@ -5,6 +5,7 @@ package cl30
 import "C"
 import (
 	"fmt"
+	"runtime"
 	"unsafe"
 )
 
@@ -224,14 +225,16 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetEventInfo.html
-func EventInfo(event Event, paramName EventInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func EventInfo(event Event, paramName EventInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetEventInfo(
 		event.handle(),
 		C.cl_event_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
@@ -304,14 +307,16 @@ const (
 // Raw strings are with a terminating NUL character.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetEventProfilingInfo.html
-func EventProfilingInfo(event Event, paramName EventProfilingInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func EventProfilingInfo(event Event, paramName EventProfilingInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
+	paramPtr := ResolvePointer(param, false, "param")
 	status := C.clGetEventProfilingInfo(
 		event.handle(),
 		C.cl_profiling_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		paramPtr,
 		&sizeReturn)
+	runtime.KeepAlive(paramPtr)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
 	}
