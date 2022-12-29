@@ -176,6 +176,14 @@ type MappedImage struct {
 	SlicePitch uintptr
 }
 
+// Pointer returns the address to the first byte of the image.
+func (mapped *MappedImage) Pointer() unsafe.Pointer {
+	return mapped.Ptr
+}
+
+// IsStatic marks that this mapped memory has a static pointer that will not change during runtime.
+func (mapped *MappedImage) IsStatic() {}
+
 // EnqueueMapImage enqueues a command to map a region of an image object into the host address space and
 // returns a description of this mapped region.
 //

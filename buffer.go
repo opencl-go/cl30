@@ -93,20 +93,24 @@ func CreateSubBuffer(buffer MemObject, flags MemFlags, createType BufferCreateTy
 	return MemObject(*((*uintptr)(unsafe.Pointer(&mem)))), nil
 }
 
-type MappedMemory struct {
+// MappedBuffer represents a static host memory to a buffer.
+type MappedBuffer struct {
 	ptr  unsafe.Pointer
 	size int
 }
 
-func (mem *MappedMemory) Size() int {
-	return mem.size
+// Size returns the number of bytes this buffer mapping represents.
+func (mapped *MappedBuffer) Size() int {
+	return mapped.size
 }
 
-func (mem *MappedMemory) Pointer() unsafe.Pointer {
-	return mem.ptr
+// Pointer returns the address to the first byte of the buffer mapping.
+func (mapped *MappedBuffer) Pointer() unsafe.Pointer {
+	return mapped.ptr
 }
 
-func (mem *MappedMemory) IsStatic() {}
+// IsStatic marks that this mapped memory has a static pointer that will not change during runtime.
+func (mapped *MappedBuffer) IsStatic() {}
 
 // EnqueueMapBuffer enqueues a command to map a region of a buffer object into the host address space and
 // returns a pointer to this mapped region.
@@ -114,7 +118,7 @@ func (mem *MappedMemory) IsStatic() {}
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueMapBuffer.html
 func EnqueueMapBuffer(commandQueue CommandQueue,
 	buffer MemObject, blocking bool, flags MapFlags, offset, size uintptr,
-	waitList []Event, event *Event) (*MappedMemory, error) {
+	waitList []Event, event *Event) (*MappedBuffer, error) {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
@@ -134,7 +138,7 @@ func EnqueueMapBuffer(commandQueue CommandQueue,
 	if status != C.CL_SUCCESS {
 		return nil, StatusError(status)
 	}
-	return &MappedMemory{
+	return &MappedBuffer{
 		ptr:  ptr,
 		size: int(size),
 	}, nil
