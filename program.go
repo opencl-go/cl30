@@ -438,14 +438,14 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use ProgramBuildInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetProgramBuildInfo.html
-func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetProgramBuildInfo(
 		program.handle(),
 		device.handle(),
 		C.cl_program_build_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		ResolvePointer(param, false, "param"),
 		&sizeReturn)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -459,8 +459,8 @@ func ProgramBuildInfo(program Program, device DeviceID, paramName ProgramBuildIn
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func ProgramBuildInfoString(program Program, device DeviceID, paramName ProgramBuildInfoName) (string, error) {
-	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
-		return ProgramBuildInfo(program, device, paramName, paramSize, paramValue)
+	return queryString(func(param HostMemory) (uintptr, error) {
+		return ProgramBuildInfo(program, device, paramName, param)
 	})
 }
 
@@ -589,13 +589,13 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use ProgramInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetProgramInfo.html
-func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func ProgramInfo(program Program, paramName ProgramInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetProgramInfo(
 		program.handle(),
 		C.cl_program_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		ResolvePointer(param, false, "param"),
 		&sizeReturn)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -608,7 +608,7 @@ func ProgramInfo(program Program, paramName ProgramInfoName, paramSize uintptr, 
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func ProgramInfoString(program Program, paramName ProgramInfoName) (string, error) {
-	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
-		return ProgramInfo(program, paramName, paramSize, paramValue)
+	return queryString(func(param HostMemory) (uintptr, error) {
+		return ProgramInfo(program, paramName, param)
 	})
 }

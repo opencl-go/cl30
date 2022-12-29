@@ -2,16 +2,13 @@ package cl30
 
 // #include "api.h"
 import "C"
-import (
-	"unsafe"
-)
 
 // queryString extracts a string with the help of a load function.
 // The load function shall return the required number of bytes for the string, including the terminating NUL byte.
 // The load function is called twice, once with zero/nil to query the needed size, then a second time to retrieve
 // the value.
-func queryString(load func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error)) (string, error) {
-	requiredSize, err := load(0, nil)
+func queryString(load func(param HostMemory) (uintptr, error)) (string, error) {
+	requiredSize, err := load(Null())
 	if err != nil {
 		return "", err
 	}
@@ -21,12 +18,12 @@ func queryString(load func(paramSize uintptr, paramValue unsafe.Pointer) (uintpt
 	if requiredSize == 0 {
 		return "", nil
 	}
-	raw := C.calloc(C.size_t(requiredSize), 1)
+	raw := AllocFixedHostMemory(int(requiredSize))
 	if raw == nil {
 		return "", ErrOutOfMemory
 	}
-	defer C.free(raw)
-	returnedSize, err := load(requiredSize, raw)
+	defer raw.Free()
+	returnedSize, err := load(raw)
 	if err != nil {
 		return "", err
 	}
@@ -39,5 +36,5 @@ func queryString(load func(paramSize uintptr, paramValue unsafe.Pointer) (uintpt
 		returnedSize = 1
 	}
 	usedSize := returnedSize - 1
-	return C.GoStringN((*C.char)(raw), C.int(usedSize)), nil
+	return C.GoStringN((*C.char)(raw.Pointer()), C.int(usedSize)), nil
 }

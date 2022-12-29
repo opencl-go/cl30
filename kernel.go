@@ -249,13 +249,13 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use KernelInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelInfo.html
-func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func KernelInfo(kernel Kernel, paramName KernelInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelInfo(
 		kernel.handle(),
 		C.cl_kernel_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		ResolvePointer(param, false, "param"),
 		&sizeReturn)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -269,8 +269,8 @@ func KernelInfo(kernel Kernel, paramName KernelInfoName, paramSize uintptr, para
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func KernelInfoString(kernel Kernel, paramName KernelInfoName) (string, error) {
-	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
-		return KernelInfo(kernel, paramName, paramSize, paramValue)
+	return queryString(func(param HostMemory) (uintptr, error) {
+		return KernelInfo(kernel, paramName, param)
 	})
 }
 
@@ -437,14 +437,14 @@ const (
 // Raw strings are with a terminating NUL character.For convenience, use KernelArgInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetKernelArgInfo.html
-func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetKernelArgInfo(
 		kernel.handle(),
 		C.cl_uint(index),
 		C.cl_kernel_work_group_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		ResolvePointer(param, false, "param"),
 		&sizeReturn)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -458,8 +458,8 @@ func KernelArgInfo(kernel Kernel, index uint32, paramName KernelArgInfoName, par
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func KernelArgInfoString(kernel Kernel, index uint32, paramName KernelArgInfoName) (string, error) {
-	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
-		return KernelArgInfo(kernel, index, paramName, paramSize, paramValue)
+	return queryString(func(param HostMemory) (uintptr, error) {
+		return KernelArgInfo(kernel, index, paramName, param)
 	})
 }
 

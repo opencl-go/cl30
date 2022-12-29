@@ -288,13 +288,13 @@ const (
 // Raw strings are with a terminating NUL character. For convenience, use ContextInfoString().
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clGetContextInfo.html
-func ContextInfo(context Context, paramName ContextInfoName, paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
+func ContextInfo(context Context, paramName ContextInfoName, param HostMemory) (uintptr, error) {
 	sizeReturn := C.size_t(0)
 	status := C.clGetContextInfo(
 		context.handle(),
 		C.cl_context_info(paramName),
-		C.size_t(paramSize),
-		paramValue,
+		sizeOf(param),
+		ResolvePointer(param, false, "param"),
 		&sizeReturn)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -307,8 +307,8 @@ func ContextInfo(context Context, paramName ContextInfoName, paramSize uintptr, 
 // This function does not verify the queried information is indeed of type string. It assumes the information is
 // a NUL terminated raw string and will extract the bytes as characters before that.
 func ContextInfoString(context Context, paramName ContextInfoName) (string, error) {
-	return queryString(func(paramSize uintptr, paramValue unsafe.Pointer) (uintptr, error) {
-		return ContextInfo(context, paramName, paramSize, paramValue)
+	return queryString(func(param HostMemory) (uintptr, error) {
+		return ContextInfo(context, paramName, param)
 	})
 }
 
