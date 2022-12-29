@@ -9,13 +9,13 @@ import (
 // CreateBuffer creates a buffer object.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateBuffer.html
-func CreateBuffer(context Context, flags MemFlags, size int, hostPtr unsafe.Pointer) (MemObject, error) {
+func CreateBuffer(context Context, flags MemFlags, size int, hostPtr HostPointer) (MemObject, error) {
 	var status C.cl_int
 	mem := C.clCreateBuffer(
 		context.handle(),
 		C.cl_mem_flags(flags),
 		C.size_t(size),
-		hostPtr,
+		ResolvePointer(hostPtr, false, "hostPtr"),
 		&status)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -27,7 +27,7 @@ func CreateBuffer(context Context, flags MemFlags, size int, hostPtr unsafe.Poin
 //
 // Since: 3.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clCreateBufferWithProperties.html
-func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostPtr unsafe.Pointer, properties ...MemProperty) (MemObject, error) {
+func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostPtr HostPointer, properties ...MemProperty) (MemObject, error) {
 	var rawPropertyList []uint64
 	for _, property := range properties {
 		rawPropertyList = append(rawPropertyList, property...)
@@ -43,7 +43,7 @@ func CreateBufferWithProperties(context Context, flags MemFlags, size int, hostP
 		(*C.cl_mem_properties)(rawProperties),
 		C.cl_mem_flags(flags),
 		C.size_t(size),
-		hostPtr,
+		ResolvePointer(hostPtr, false, "hostPtr"),
 		&status)
 	if status != C.CL_SUCCESS {
 		return 0, StatusError(status)
@@ -93,13 +93,28 @@ func CreateSubBuffer(buffer MemObject, flags MemFlags, createType BufferCreateTy
 	return MemObject(*((*uintptr)(unsafe.Pointer(&mem)))), nil
 }
 
+type MappedMemory struct {
+	ptr  unsafe.Pointer
+	size int
+}
+
+func (mem *MappedMemory) Size() int {
+	return mem.size
+}
+
+func (mem *MappedMemory) Pointer() unsafe.Pointer {
+	return mem.ptr
+}
+
+func (mem *MappedMemory) IsStatic() {}
+
 // EnqueueMapBuffer enqueues a command to map a region of a buffer object into the host address space and
 // returns a pointer to this mapped region.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueMapBuffer.html
 func EnqueueMapBuffer(commandQueue CommandQueue,
 	buffer MemObject, blocking bool, flags MapFlags, offset, size uintptr,
-	waitList []Event, event *Event) (unsafe.Pointer, error) {
+	waitList []Event, event *Event) (*MappedMemory, error) {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
@@ -119,13 +134,16 @@ func EnqueueMapBuffer(commandQueue CommandQueue,
 	if status != C.CL_SUCCESS {
 		return nil, StatusError(status)
 	}
-	return ptr, nil
+	return &MappedMemory{
+		ptr:  ptr,
+		size: int(size),
+	}, nil
 }
 
 // EnqueueReadBuffer enqueues a command to read from a buffer object to host memory.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueReadBuffer.html
-func EnqueueReadBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bool, offset, size uintptr, data unsafe.Pointer,
+func EnqueueReadBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bool, offset uintptr, data HostMemory,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -136,8 +154,8 @@ func EnqueueReadBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bo
 		mem.handle(),
 		C.cl_bool(BoolFrom(blockingRead)),
 		C.size_t(offset),
-		C.size_t(size),
-		data,
+		sizeOf(data),
+		ResolvePointer(data, !blockingRead, "data"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -153,7 +171,7 @@ func EnqueueReadBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bo
 // Since: 1.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueReadBufferRect.html
 func EnqueueReadBufferRect(commandQueue CommandQueue, mem MemObject, blockingRead bool, bufferOrigin, hostOrigin, region [3]uintptr,
-	bufferRowPitch, bufferSlicePitch, hostRowPitch, hostSlicePitch uintptr, data unsafe.Pointer, waitList []Event, event *Event) error {
+	bufferRowPitch, bufferSlicePitch, hostRowPitch, hostSlicePitch uintptr, data HostMemory, waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
@@ -169,7 +187,7 @@ func EnqueueReadBufferRect(commandQueue CommandQueue, mem MemObject, blockingRea
 		C.size_t(bufferSlicePitch),
 		C.size_t(hostRowPitch),
 		C.size_t(hostSlicePitch),
-		data,
+		ResolvePointer(data, !blockingRead, "data"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -182,7 +200,7 @@ func EnqueueReadBufferRect(commandQueue CommandQueue, mem MemObject, blockingRea
 // EnqueueWriteBuffer enqueues a command to write to a buffer object from host memory.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueWriteBuffer.html
-func EnqueueWriteBuffer(commandQueue CommandQueue, mem MemObject, blockingRead bool, offset, size uintptr, data unsafe.Pointer,
+func EnqueueWriteBuffer(commandQueue CommandQueue, mem MemObject, blockingWrite bool, offset uintptr, data HostMemory,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -191,10 +209,10 @@ func EnqueueWriteBuffer(commandQueue CommandQueue, mem MemObject, blockingRead b
 	status := C.clEnqueueWriteBuffer(
 		commandQueue.handle(),
 		mem.handle(),
-		C.cl_bool(BoolFrom(blockingRead)),
+		C.cl_bool(BoolFrom(blockingWrite)),
 		C.size_t(offset),
-		C.size_t(size),
-		data,
+		sizeOf(data),
+		ResolvePointer(data, !blockingWrite, "data"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -209,8 +227,8 @@ func EnqueueWriteBuffer(commandQueue CommandQueue, mem MemObject, blockingRead b
 //
 // Since: 1.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueWriteBufferRect.html
-func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingRead bool, bufferOrigin, hostOrigin, region [3]uintptr,
-	bufferRowPitch, bufferSlicePitch, hostRowPitch, hostSlicePitch uintptr, data unsafe.Pointer, waitList []Event, event *Event) error {
+func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingWrite bool, bufferOrigin, hostOrigin, region [3]uintptr,
+	bufferRowPitch, bufferSlicePitch, hostRowPitch, hostSlicePitch uintptr, data HostMemory, waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
@@ -218,7 +236,7 @@ func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingRe
 	status := C.clEnqueueWriteBufferRect(
 		commandQueue.handle(),
 		mem.handle(),
-		C.cl_bool(BoolFrom(blockingRead)),
+		C.cl_bool(BoolFrom(blockingWrite)),
 		(*C.size_t)(unsafe.Pointer(&bufferOrigin[0])),
 		(*C.size_t)(unsafe.Pointer(&hostOrigin[0])),
 		(*C.size_t)(unsafe.Pointer(&region[0])),
@@ -226,7 +244,7 @@ func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingRe
 		C.size_t(bufferSlicePitch),
 		C.size_t(hostRowPitch),
 		C.size_t(hostSlicePitch),
-		data,
+		ResolvePointer(data, !blockingWrite, "data"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -240,7 +258,7 @@ func EnqueueWriteBufferRect(commandQueue CommandQueue, mem MemObject, blockingRe
 //
 // Since: 1.2
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueFillBuffer.html
-func EnqueueFillBuffer(commandQueue CommandQueue, mem MemObject, pattern unsafe.Pointer, patternSize, offset, size uintptr,
+func EnqueueFillBuffer(commandQueue CommandQueue, mem MemObject, pattern HostMemory, offset, size uintptr,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -249,8 +267,8 @@ func EnqueueFillBuffer(commandQueue CommandQueue, mem MemObject, pattern unsafe.
 	status := C.clEnqueueFillBuffer(
 		commandQueue.handle(),
 		mem.handle(),
-		pattern,
-		C.size_t(patternSize),
+		ResolvePointer(pattern, false, "pattern"),
+		sizeOf(pattern),
 		C.size_t(offset),
 		C.size_t(size),
 		C.cl_uint(len(waitList)),

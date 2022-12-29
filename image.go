@@ -296,7 +296,7 @@ func ImageInfo(image MemObject, paramName ImageInfoName, paramSize uintptr, para
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueReadImage.html
 func EnqueueReadImage(commandQueue CommandQueue, image MemObject, blocking bool, origin, region [3]uintptr,
-	rowPitch, slicePitch uintptr, ptr unsafe.Pointer,
+	rowPitch, slicePitch uintptr, ptr HostMemory,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -310,7 +310,7 @@ func EnqueueReadImage(commandQueue CommandQueue, image MemObject, blocking bool,
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.size_t(rowPitch),
 		C.size_t(slicePitch),
-		ptr,
+		ResolvePointer(ptr, !blocking, "ptr"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -324,7 +324,7 @@ func EnqueueReadImage(commandQueue CommandQueue, image MemObject, blocking bool,
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueWriteImage.html
 func EnqueueWriteImage(commandQueue CommandQueue, image MemObject, blocking bool, origin, region [3]uintptr,
-	rowPitch, slicePitch uintptr, ptr unsafe.Pointer,
+	rowPitch, slicePitch uintptr, ptr HostMemory,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -338,7 +338,7 @@ func EnqueueWriteImage(commandQueue CommandQueue, image MemObject, blocking bool
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.size_t(rowPitch),
 		C.size_t(slicePitch),
-		ptr,
+		ResolvePointer(ptr, !blocking, "ptr"),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -358,7 +358,7 @@ func EnqueueWriteImage(commandQueue CommandQueue, image MemObject, blocking bool
 // The fill color will be converted to the appropriate image channel format and order associated with image.
 //
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueFillImage.html
-func EnqueueFillImage(commandQueue CommandQueue, image MemObject, fillColor unsafe.Pointer, origin, region [3]uintptr,
+func EnqueueFillImage(commandQueue CommandQueue, image MemObject, fillColor HostMemory, origin, region [3]uintptr,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -367,7 +367,7 @@ func EnqueueFillImage(commandQueue CommandQueue, image MemObject, fillColor unsa
 	status := C.clEnqueueFillImage(
 		commandQueue.handle(),
 		image.handle(),
-		fillColor,
+		ResolvePointer(fillColor, false, "fillColor"),
 		(*C.size_t)(unsafe.Pointer(&origin[0])),
 		(*C.size_t)(unsafe.Pointer(&region[0])),
 		C.cl_uint(len(waitList)),

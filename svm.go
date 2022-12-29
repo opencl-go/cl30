@@ -13,10 +13,33 @@ package cl30
 //    cl_uint waitListCount, cl_event const *waitList,
 //    cl_event *event);
 import "C"
-import "unsafe"
+import (
+	"fmt"
+	"unsafe"
+)
 
 // SvmMemFlags describe properties of a shared virtual memory (SVM) buffer.
 type SvmMemFlags C.cl_mem_flags
+
+// SvmBuffer is a shared virtual memory (SVM) buffer.
+type SvmBuffer struct {
+	size int
+	ptr  unsafe.Pointer
+}
+
+// Size returns the number of bytes the buffer contains.
+func (buf *SvmBuffer) Size() int {
+	return buf.size
+}
+
+// Pointer returns the raw pointer value to the buffer. This value is only usable for host copy operations
+// while the buffer is mapped.
+func (buf *SvmBuffer) Pointer() unsafe.Pointer {
+	return buf.ptr
+}
+
+// IsStatic is a marker to indicate the pointer is a static value.
+func (buf *SvmBuffer) IsStatic() {}
 
 // SvmAlloc allocates a shared virtual memory (SVM) buffer that can be shared by the host and all devices in an OpenCL
 // context that support shared virtual memory.
@@ -26,7 +49,7 @@ type SvmMemFlags C.cl_mem_flags
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clSVMAlloc.html
-func SvmAlloc(context Context, flags SvmMemFlags, size int, alignment uint32) (unsafe.Pointer, error) {
+func SvmAlloc(context Context, flags SvmMemFlags, size int, alignment uint32) (*SvmBuffer, error) {
 	ptr := C.clSVMAlloc(
 		context.handle(),
 		C.cl_svm_mem_flags(flags),
@@ -35,7 +58,11 @@ func SvmAlloc(context Context, flags SvmMemFlags, size int, alignment uint32) (u
 	if ptr == nil {
 		return nil, ErrOutOfMemory
 	}
-	return ptr, nil
+	buf := &SvmBuffer{
+		size: size,
+		ptr:  ptr,
+	}
+	return buf, nil
 }
 
 // SvmFree frees a shared virtual memory buffer allocated using SvmAlloc().
@@ -46,16 +73,16 @@ func SvmAlloc(context Context, flags SvmMemFlags, size int, alignment uint32) (u
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clSVMFree.html
-func SvmFree(context Context, ptr unsafe.Pointer) {
-	C.clSVMFree(context.handle(), ptr)
+func SvmFree(context Context, ptr *SvmBuffer) {
+	C.clSVMFree(context.handle(), ptr.ptr)
 }
 
 // EnqueueSvmFree enqueues a command to free shared virtual memory allocated using SvmAlloc() or a shared system
 // memory pointer.
 //
 // Since: 2.0
-// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSvmFree.html
-func EnqueueSvmFree(commandQueue CommandQueue, ptrs []unsafe.Pointer, callback func(CommandQueue, []unsafe.Pointer), waitList []Event, event *Event) error {
+// See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMFree.html
+func EnqueueSvmFree(commandQueue CommandQueue, ptrs []HostPointer, callback func(CommandQueue, []unsafe.Pointer), waitList []Event, event *Event) error {
 	var callbackUserData userData
 	if callback != nil {
 		var err error
@@ -70,7 +97,7 @@ func EnqueueSvmFree(commandQueue CommandQueue, ptrs []unsafe.Pointer, callback f
 	}
 	ptrAddresses := make([]uintptr, len(ptrs))
 	for i, ptr := range ptrs {
-		ptrAddresses[i] = uintptr(ptr)
+		ptrAddresses[i] = uintptr(ResolvePointer(ptr, true, fmt.Sprintf("ptrs[%d]", i)))
 	}
 	status := C.cl30EnqueueSVMFree(
 		commandQueue.handle(),
@@ -99,7 +126,7 @@ func cl30GoSvmFreeCallback(commandQueue CommandQueue, svmPointerCount C.cl_uint,
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMMemcpy.html
-func EnqueueSvmMemcpy(commandQueue CommandQueue, blocking bool, dstPtr unsafe.Pointer, srcPtr unsafe.Pointer, size int,
+func EnqueueSvmMemcpy(commandQueue CommandQueue, blocking bool, dstPtr, srcPtr HostPointer, size int,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -108,8 +135,8 @@ func EnqueueSvmMemcpy(commandQueue CommandQueue, blocking bool, dstPtr unsafe.Po
 	status := C.clEnqueueSVMMemcpy(
 		commandQueue.handle(),
 		C.cl_bool(BoolFrom(blocking)),
-		dstPtr,
-		srcPtr,
+		ResolvePointer(dstPtr, !blocking, "dstPtr"),
+		ResolvePointer(srcPtr, !blocking, "srcPtr"),
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
@@ -126,7 +153,7 @@ func EnqueueSvmMemcpy(commandQueue CommandQueue, blocking bool, dstPtr unsafe.Po
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMMemFill.html
-func EnqueueSvmMemFill(commandQueue CommandQueue, svmPtr, pattern unsafe.Pointer, patternSize, size int,
+func EnqueueSvmMemFill(commandQueue CommandQueue, svmPtr, pattern HostPointer, patternSize, size int,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -134,8 +161,8 @@ func EnqueueSvmMemFill(commandQueue CommandQueue, svmPtr, pattern unsafe.Pointer
 	}
 	status := C.clEnqueueSVMMemFill(
 		commandQueue.handle(),
-		svmPtr,
-		pattern,
+		ResolvePointer(svmPtr, true, "svmPtr"),
+		ResolvePointer(pattern, true, "pattern"),
 		C.size_t(patternSize),
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
@@ -151,7 +178,7 @@ func EnqueueSvmMemFill(commandQueue CommandQueue, svmPtr, pattern unsafe.Pointer
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMMap.html
-func EnqueueSvmMap(commandQueue CommandQueue, blocking bool, flags MemFlags, svmPtr unsafe.Pointer, size int,
+func EnqueueSvmMap(commandQueue CommandQueue, blocking bool, flags MemFlags, svmPtr *SvmBuffer, size int,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -161,7 +188,7 @@ func EnqueueSvmMap(commandQueue CommandQueue, blocking bool, flags MemFlags, svm
 		commandQueue.handle(),
 		C.cl_bool(BoolFrom(blocking)),
 		C.cl_map_flags(flags),
-		svmPtr,
+		svmPtr.ptr,
 		C.size_t(size),
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
@@ -177,14 +204,14 @@ func EnqueueSvmMap(commandQueue CommandQueue, blocking bool, flags MemFlags, svm
 //
 // Since: 2.0
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMUnmap.html
-func EnqueueSvmUnmap(commandQueue CommandQueue, svmPtr unsafe.Pointer, waitList []Event, event *Event) error {
+func EnqueueSvmUnmap(commandQueue CommandQueue, svmPtr *SvmBuffer, waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
 		rawWaitList = unsafe.Pointer(&waitList[0])
 	}
 	status := C.clEnqueueSVMUnmap(
 		commandQueue.handle(),
-		svmPtr,
+		svmPtr.ptr,
 		C.cl_uint(len(waitList)),
 		(*C.cl_event)(rawWaitList),
 		(*C.cl_event)(unsafe.Pointer(event)))
@@ -199,7 +226,7 @@ func EnqueueSvmUnmap(commandQueue CommandQueue, svmPtr unsafe.Pointer, waitList 
 //
 // Since: 2.1
 // See also: https://registry.khronos.org/OpenCL/sdk/3.0/docs/man/html/clEnqueueSVMMigrateMem.html
-func EnqueueSvmMigrateMem(commandQueue CommandQueue, svmPtrs []unsafe.Pointer, sizes []int, flags MemMigrationFlags,
+func EnqueueSvmMigrateMem(commandQueue CommandQueue, svmPtrs []*SvmBuffer, sizes []int, flags MemMigrationFlags,
 	waitList []Event, event *Event) error {
 	var rawWaitList unsafe.Pointer
 	if len(waitList) > 0 {
@@ -207,7 +234,7 @@ func EnqueueSvmMigrateMem(commandQueue CommandQueue, svmPtrs []unsafe.Pointer, s
 	}
 	svmPtrAddresses := make([]uintptr, len(svmPtrs))
 	for i, svmPtr := range svmPtrs {
-		svmPtrAddresses[i] = uintptr(svmPtr)
+		svmPtrAddresses[i] = uintptr(svmPtr.ptr)
 	}
 	var sizesPtr unsafe.Pointer
 	if len(sizes) > 0 {
