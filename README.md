@@ -5,11 +5,13 @@
 [![GoReportCard](https://goreportcard.com/badge/github.com/opencl-go/cl30)](https://goreportcard.com/report/github.com/opencl-go/cl30)
 [![License](https://img.shields.io/github/license/opencl-go/cl30.svg)](https://github.com/opencl-go/cl30/blob/main/LICENSE)
 [![OpenCL 3.0](https://img.shields.io/badge/OpenCL-3.0-green.svg)][opencl-api]
+![Maintenance](https://img.shields.io/maintenance/no/2024)
 
 This library provides a complete wrapper for the OpenCL 3.0 API.
 If you require a different API level, refer to [the opencl-go project][opencl-go] to see which versions are available.
 
-**This is work-in-progress. The wrapper is not yet in a state to provide useful functionality**
+**This wrapper is not in a state to provide useful functionality and contains potential invalid memory access. The repository is archived and unmaintained.
+Please see [Maintenance Notice](https://github.com/opencl-go/opencl-go.github.io/discussions/25) for further details.**
 
 ## Usage
 
